@@ -4,657 +4,804 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Vardiya Takvimi</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #3b82f6;
-            --primary-dark: #1d4ed8;
-            --primary-glow: rgba(59,130,246,0.25);
-            --success: #10b981;
-            --success-dark: #059669;
-            --danger: #ef4444;
-            --danger-dark: #dc2626;
-            --warning: #f59e0b;
-            --warning-dark: #d97706;
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --primary-light: #eef2ff;
+        --primary-glow: rgba(99, 102, 241, 0.3);
+        --secondary: #06b6d4;
+        --secondary-glow: rgba(6, 182, 212, 0.25);
+        --success: #10b981;
+        --success-dark: #059669;
+        --success-glow: rgba(16, 185, 129, 0.3);
+        --danger: #ef4444;
+        --danger-dark: #dc2626;
+        --danger-glow: rgba(239, 68, 68, 0.3);
+        --warning: #f59e0b;
+        --warning-dark: #d97706;
+        --warning-glow: rgba(245, 158, 11, 0.3);
+        --bg-color: #0f172a;
+        --bg-card: #1e293b;
+        --bg-card-alt: #1a2332;
+        --table-border: rgba(148, 163, 184, 0.12);
+        --izinli-bg: linear-gradient(135deg, #ef4444, #dc2626);
+        --today-bg: rgba(16, 185, 129, 0.1);
+        --today-border: #10b981;
+        --tomorrow-bg: rgba(245, 158, 11, 0.1);
+        --tomorrow-border: #f59e0b;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --radius: 16px;
+        --radius-sm: 10px;
+        --radius-xs: 6px;
+        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
 
-            --bg: #0b0f1a;
-            --bg-2: #111827;
-            --bg-3: #1a2235;
-            --surface: rgba(255,255,255,0.04);
-            --surface-hover: rgba(255,255,255,0.07);
-            --border: rgba(255,255,255,0.08);
-            --border-strong: rgba(255,255,255,0.14);
+    * { box-sizing: border-box; }
 
-            --text: #f0f4ff;
-            --text-2: #94a3b8;
-            --text-3: #64748b;
+    body {
+        font-family: var(--font-sans);
+        background: var(--bg-color);
+        margin: 0;
+        padding: 20px;
+        color: var(--text-primary);
+        -webkit-tap-highlight-color: transparent;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
 
-            --header-accent: #3b82f6;
-            --izinli-bg: rgba(239,68,68,0.18);
-            --izinli-border: rgba(239,68,68,0.4);
-            --today-bg: rgba(16,185,129,0.1);
-            --today-border: rgba(16,185,129,0.5);
-            --tomorrow-bg: rgba(245,158,11,0.08);
-            --tomorrow-border: rgba(245,158,11,0.4);
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background:
+            radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
+            radial-gradient(ellipse at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: 0;
+        animation: bgShift 15s ease-in-out infinite alternate;
+    }
 
-            --radius: 12px;
-            --radius-sm: 8px;
-            --shadow: 0 4px 24px rgba(0,0,0,0.4);
-            --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
-        }
+    @keyframes bgShift {
+        0% { background-position: 0% 0%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 100%; }
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+    .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: var(--bg-card);
+        border-radius: var(--radius);
+        box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.08), 0 8px 32px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        position: relative;
+        z-index: 1;
+        animation: containerIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
-        body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 16px;
-            -webkit-tap-highlight-color: transparent;
-            background-image:
-                radial-gradient(ellipse 80% 60% at 50% -20%, rgba(59,130,246,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 40% at 85% 80%, rgba(16,185,129,0.06) 0%, transparent 50%);
-        }
+    @keyframes containerIn {
+        from { opacity: 0; transform: translateY(30px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
 
-        /* ── Container ── */
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
+    .header {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1a1f35 100%);
+        padding: 22px 28px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+    }
 
-        /* ── Header ── */
-        .header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border: 1px solid var(--border-strong);
-            border-bottom: none;
-            border-radius: var(--radius) var(--radius) 0 0;
-            padding: 20px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
-        }
+    .header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+            radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+        animation: headerGlow 6s ease-in-out infinite alternate;
+    }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(59,130,246,0.07) 0%, transparent 60%);
-            pointer-events: none;
-        }
+    @keyframes headerGlow {
+        0% { opacity: 0.6; transform: scale(1); }
+        100% { opacity: 1; transform: scale(1.05); }
+    }
 
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            position: relative;
-        }
+    .header::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 10%; right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.4), rgba(6, 182, 212, 0.4), transparent);
+        animation: shimmer 3s ease-in-out infinite;
+    }
 
-        .header-icon {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            box-shadow: 0 4px 16px rgba(59,130,246,0.4);
-            flex-shrink: 0;
-        }
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); opacity: 0; }
+        50% { transform: translateX(0%); opacity: 1; }
+        100% { transform: translateX(100%); opacity: 0; }
+    }
 
-        .header h1 {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            color: var(--text);
-        }
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 0.5px;
+        position: relative;
+        background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 
-        .header-subtitle {
-            font-size: 12px;
-            color: var(--text-3);
-            font-weight: 400;
-            margin-top: 1px;
-            letter-spacing: 0.3px;
-        }
+    .header h1 span {
+        background: linear-gradient(135deg, #6366f1, #06b6d4, #6366f1);
+        background-size: 200% 200%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientText 4s ease-in-out infinite;
+    }
 
-        #headerButtons {
-            position: relative;
-        }
+    @keyframes gradientText {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .admin-btn {
+        position: absolute;
+        right: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        padding: 8px 18px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-secondary);
+        backdrop-filter: blur(8px);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        letter-spacing: 0.3px;
+        z-index: 2;
+    }
+
+    .admin-btn:hover {
+        background: rgba(99, 102, 241, 0.15);
+        border-color: rgba(99, 102, 241, 0.3);
+        color: #fff;
+        box-shadow: 0 0 24px rgba(99, 102, 241, 0.15), inset 0 0 24px rgba(99, 102, 241, 0.05);
+        transform: translateY(-50%) scale(1.04);
+    }
+
+    .controls {
+        padding: 18px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: var(--bg-card-alt);
+        border-bottom: 1px solid var(--table-border);
+    }
+
+    .control-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .control-row label {
+        min-width: 65px;
+        font-weight: 600;
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    select, input[type="date"], input[type="password"], input[type="text"] {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        border-radius: var(--radius-xs);
+        font-size: 13px;
+        font-family: var(--font-sans);
+        color: var(--text-primary);
+        background: rgba(15, 23, 42, 0.6);
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        outline: none;
+        backdrop-filter: blur(4px);
+    }
+
+    select:focus, input[type="date"]:focus, input[type="password"]:focus, input[type="text"]:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-glow), 0 0 20px rgba(99, 102, 241, 0.1);
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    select:hover, input[type="date"]:hover, input[type="password"]:hover, input[type="text"]:hover {
+        border-color: rgba(148, 163, 184, 0.3);
+    }
+
+    select option {
+        background: #1e293b;
+        color: var(--text-primary);
+    }
+
+    button {
+        padding: 10px 22px;
+        border: none;
+        border-radius: var(--radius-xs);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: var(--font-sans);
+        letter-spacing: 0.3px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    button::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    button:active { transform: scale(0.96); }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.25);
+    }
+    .btn-primary:hover {
+        box-shadow: 0 6px 24px rgba(99, 102, 241, 0.4), 0 0 40px rgba(99, 102, 241, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, var(--success), var(--success-dark));
+        color: white;
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.25);
+    }
+    .btn-success:hover {
+        box-shadow: 0 6px 24px rgba(16, 185, 129, 0.4), 0 0 40px rgba(16, 185, 129, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+        color: white;
+        box-shadow: 0 4px 16px rgba(239, 68, 68, 0.25);
+    }
+    .btn-danger:hover {
+        box-shadow: 0 6px 24px rgba(239, 68, 68, 0.4), 0 0 40px rgba(239, 68, 68, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, var(--warning), var(--warning-dark));
+        color: white;
+        box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+    }
+    .btn-warning:hover {
+        box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4), 0 0 40px rgba(245, 158, 11, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .info-panel {
+        background: rgba(15, 23, 42, 0.5);
+        padding: 14px 20px;
+        margin: 16px 24px;
+        border-radius: var(--radius-xs);
+        font-size: 13px;
+        border: 1px solid rgba(148, 163, 184, 0.08);
+        border-left: 3px solid var(--primary);
+        backdrop-filter: blur(4px);
+        animation: panelSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes panelSlide {
+        from { opacity: 0; transform: translateX(-10px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .izinli-text {
+        color: #fca5a5;
+        font-weight: 700;
+        background: rgba(239, 68, 68, 0.1);
+        padding: 2px 8px;
+        border-radius: 4px;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 4px 20px 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 12px;
+        text-align: center;
+        min-width: 650px;
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+        border: 1px solid var(--table-border);
+        animation: tableFade 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes tableFade {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    th, td {
+        padding: 11px 8px;
+        white-space: nowrap;
+        border-bottom: 1px solid var(--table-border);
+    }
+
+    th {
+        background: rgba(15, 23, 42, 0.6);
+        font-weight: 700;
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    td:first-child, th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background: var(--bg-card);
+        font-weight: 600;
+        font-size: 11px;
+        text-align: left;
+        min-width: 105px;
+        border-right: 1px solid var(--table-border);
+    }
+
+    th:first-child {
+        z-index: 3;
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    td:first-child strong {
+        color: var(--text-primary);
+        display: block;
+        font-size: 11px;
+    }
+
+    .week-separator {
+        background: rgba(15, 23, 42, 0.4) !important;
+        font-weight: 700;
+        text-align: left;
+        padding: 10px 16px !important;
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--table-border);
+    }
+
+    .izinli-cell {
+        background: var(--izinli-bg) !important;
+        color: white;
+        font-weight: 700;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        border-radius: 0 !important;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .izinli-cell::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+        animation: izinliShimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes izinliShimmer {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .row-today {
+        background: var(--today-bg);
+        transition: background 0.3s ease;
+        animation: todayPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes todayPulse {
+        0%, 100% { background: var(--today-bg); }
+        50% { background: rgba(16, 185, 129, 0.15); }
+    }
+
+    .row-today td:first-child {
+        background: rgba(16, 185, 129, 0.08) !important;
+        border-left: 3px solid var(--today-border);
+    }
+
+    .row-tomorrow {
+        background: var(--tomorrow-bg);
+        transition: background 0.3s ease;
+    }
+
+    .row-tomorrow td:first-child {
+        background: rgba(245, 158, 11, 0.08) !important;
+        border-left: 3px solid var(--tomorrow-border);
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        position: relative;
+    }
+
+    .badge-today {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
+        animation: badgePop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .badge-tomorrow {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+        animation: badgePop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes badgePop {
+        0% { transform: scale(0); opacity: 0; }
+        60% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Modals */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 100;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 20px;
+        overflow-y: auto;
+        backdrop-filter: blur(8px);
+        animation: modalFade 0.25s ease;
+    }
+
+    .modal.active { display: flex; }
+
+    @keyframes modalFade {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes modalSlide {
+        from { transform: translateY(30px) scale(0.96); opacity: 0; }
+        to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* Spinner */
+    #saveSpinner {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 200;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(8px);
+    }
+    #saveSpinner.active { display: flex; }
+    .spinner-box {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        border-radius: 16px;
+        padding: 40px 52px;
+        text-align: center;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(148, 163, 184, 0.1);
+        animation: modalSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(148, 163, 184, 0.08);
+    }
+    .spinner-ring {
+        width: 48px;
+        height: 48px;
+        border: 3px solid rgba(148, 163, 184, 0.1);
+        border-top-color: var(--primary);
+        border-right-color: var(--secondary);
+        border-radius: 50%;
+        animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        margin: 0 auto 18px;
+        box-shadow: 0 0 30px rgba(99, 102, 241, 0.15);
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    .spinner-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, #1e293b, #1a2332);
+        border-radius: 16px;
+        width: 95%;
+        max-width: 460px;
+        margin: 10px auto;
+        padding: 28px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(148, 163, 184, 0.08);
+        animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(148, 163, 184, 0.06);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--table-border);
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    .close-btn {
+        background: rgba(148, 163, 184, 0.08);
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 6px 12px;
+        color: var(--text-muted);
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        line-height: 1;
+    }
+
+    .close-btn:hover {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text-secondary);
+        letter-spacing: 0.3px;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+    }
+
+    .edit-cell {
+        cursor: pointer;
+        padding: 6px 10px;
+        border-radius: var(--radius-xs);
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        display: inline-block;
+        font-weight: 500;
+        position: relative;
+    }
+
+    .edit-cell:hover {
+        background: rgba(99, 102, 241, 0.1);
+        color: #a5b4fc;
+        transform: translateY(-1px);
+    }
+    .edit-cell:active {
+        transform: scale(0.94);
+    }
+    .edit-cell.editing {
+        background: rgba(245, 158, 11, 0.1);
+        outline: 2px solid rgba(245, 158, 11, 0.3);
+        outline-offset: 1px;
+        animation: editingPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes editingPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.1); }
+        50% { box-shadow: 0 0 12px rgba(245, 158, 11, 0.15); }
+    }
+
+    @media (hover: none) {
+        .edit-cell:hover { background: inherit; color: inherit; transform: none; }
+    }
+
+    .footer {
+        text-align: center;
+        padding: 16px 24px;
+        color: var(--text-muted);
+        font-size: 11px;
+        border-top: 1px solid var(--table-border);
+        background: var(--bg-card-alt);
+        letter-spacing: 0.3px;
+    }
+
+    .toggle-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--table-border);
+    }
+
+    /* Premium Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.2);
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.35); background-clip: padding-box; }
+
+    /* Responsive - Tablet */
+    @media (max-width: 768px) {
+        body { padding: 12px; }
+        .header { padding: 18px 20px; }
+        .header h1 { font-size: 20px; }
+        .controls { padding: 14px 16px; gap: 10px; }
+        .info-panel { margin: 12px 16px; }
+        .table-wrapper { padding: 4px 12px 16px; }
 
         .admin-btn {
-            background: var(--surface);
-            border: 1px solid var(--border-strong);
-            color: var(--text-2);
-            padding: 9px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'DM Sans', sans-serif;
-            letter-spacing: 0.2px;
-        }
-
-        .admin-btn:hover {
-            background: var(--surface-hover);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        /* ── Controls ── */
-        .controls {
-            background: var(--bg-2);
-            border: 1px solid var(--border);
-            border-bottom: none;
-            padding: 16px 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .control-group label {
+            padding: 6px 14px;
             font-size: 11px;
-            font-weight: 600;
-            color: var(--text-3);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
+            right: 16px;
         }
+    }
 
-        .control-inner {
-            display: flex;
-            gap: 8px;
-        }
-
-        select, input[type="date"], input[type="password"], input[type="text"] {
-            flex: 1;
-            padding: 10px 13px;
-            background: var(--bg-3);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            color: var(--text);
-            font-family: 'DM Sans', sans-serif;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 34px;
-            cursor: pointer;
-        }
-
-        select:focus, input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-glow);
-        }
-
-        select option {
-            background: var(--bg-2);
-            color: var(--text);
-        }
-
-        /* ── Buttons ── */
-        button {
-            padding: 10px 18px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.18s;
-            font-family: 'DM Sans', sans-serif;
-            letter-spacing: 0.2px;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 2px 12px rgba(59,130,246,0.35);
-        }
-        .btn-primary:hover { box-shadow: 0 4px 20px rgba(59,130,246,0.5); transform: translateY(-1px); }
-
-        .btn-success {
-            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
-            color: white;
-            box-shadow: 0 2px 12px rgba(16,185,129,0.3);
-        }
-        .btn-success:hover { box-shadow: 0 4px 20px rgba(16,185,129,0.45); transform: translateY(-1px); }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
-            color: white;
-            box-shadow: 0 2px 12px rgba(239,68,68,0.3);
-        }
-        .btn-danger:hover { box-shadow: 0 4px 20px rgba(239,68,68,0.45); transform: translateY(-1px); }
-
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
-            color: #0b0f1a;
-            box-shadow: 0 2px 12px rgba(245,158,11,0.3);
-        }
-        .btn-warning:hover { box-shadow: 0 4px 20px rgba(245,158,11,0.45); transform: translateY(-1px); }
-
-        button:active { transform: scale(0.97) !important; }
-
-        /* ── Info Panel ── */
-        .info-panel {
-            background: var(--bg-2);
-            border: 1px solid var(--border);
-            border-bottom: none;
-            padding: 14px 20px;
-            font-size: 13px;
-            color: var(--text-2);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px 20px;
-            align-items: center;
-            line-height: 1.5;
-        }
-
-        .info-panel strong {
-            color: var(--text);
-            font-weight: 600;
-        }
-
-        .izinli-text { color: #f87171; font-weight: 600; }
-
-        /* ── Table ── */
-        .table-wrapper {
-            background: var(--bg-2);
-            border: 1px solid var(--border);
-            border-radius: 0 0 var(--radius) var(--radius);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
+    /* Responsive - Mobile */
+    @media (max-width: 600px) {
+        body { padding: 8px; }
+        .header { padding: 16px 14px; }
+        .header h1 { font-size: 17px; letter-spacing: 0.3px; }
+        .admin-btn { padding: 6px 10px; font-size: 10px; right: 12px; }
+        .controls { padding: 12px 12px; gap: 8px; }
+        .control-row { flex-wrap: wrap; }
+        .control-row label {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            text-align: center;
-            min-width: 600px;
+            margin-bottom: 2px;
+            font-size: 10px;
         }
+        select, input[type="date"] {
+            font-size: 14px;
+            min-height: 44px;
+            padding: 10px 12px;
+        }
+        th, td { padding: 10px 5px; font-size: 10px; }
+        th { font-size: 9px; }
+        td:first-child, th:first-child { min-width: 85px; }
+        .table-wrapper { padding: 4px 8px 12px; }
+        .info-panel { margin: 10px 12px; padding: 12px 14px; font-size: 12px; }
 
-        th, td {
-            border: 1px solid var(--border);
-            padding: 11px 8px;
-            white-space: nowrap;
-        }
-
-        thead th {
-            background: #0d1520;
-            color: var(--text-2);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            border-bottom: 2px solid var(--border-strong);
-        }
-
-        thead th:first-child {
-            z-index: 3;
-            background: #0d1520;
-        }
-
-        td:first-child, th:first-child {
-            position: sticky;
-            left: 0;
-            z-index: 1;
-            background: var(--bg-2);
-            font-family: 'DM Mono', monospace;
-            font-size: 12px;
-            text-align: left;
-            padding-left: 16px;
-            min-width: 130px;
-            border-right: 2px solid var(--border-strong);
-        }
-
-        tbody tr:hover td {
-            background: var(--surface-hover);
-        }
-        tbody tr:hover td:first-child {
-            background: var(--surface-hover);
-        }
-
-        /* Week separator */
-        .week-separator {
-            background: linear-gradient(90deg, rgba(59,130,246,0.12) 0%, transparent 100%) !important;
-            color: var(--primary) !important;
-            font-weight: 600;
-            font-size: 12px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            border-top: 2px solid rgba(59,130,246,0.25) !important;
-            padding-left: 16px !important;
-            text-align: left;
-        }
-
-        /* Sub-header rows */
-        .sub-header th {
-            background: #0d1520;
-            color: var(--text-2);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.6px;
-            text-transform: uppercase;
-        }
-
-        /* İzinli */
-        .izinli-cell {
-            background: var(--izinli-bg) !important;
-            color: #fca5a5 !important;
-            font-weight: 600;
-            border-color: var(--izinli-border) !important;
-        }
-        tbody tr:hover .izinli-cell {
-            background: rgba(239,68,68,0.22) !important;
-        }
-
-        /* Today / Tomorrow */
-        .row-today td { background: var(--today-bg); }
-        .row-today td:first-child {
-            background: var(--today-bg);
-            border-left: 3px solid var(--success);
-        }
-        .row-tomorrow td { background: var(--tomorrow-bg); }
-        .row-tomorrow td:first-child {
-            background: var(--tomorrow-bg);
-            border-left: 3px solid var(--warning);
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 2px 7px;
-            border-radius: 20px;
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            vertical-align: middle;
-            margin-left: 4px;
-        }
-        .badge-today {
-            background: var(--success);
-            color: white;
-            box-shadow: 0 2px 8px rgba(16,185,129,0.4);
-        }
-        .badge-tomorrow {
-            background: var(--warning);
-            color: #0b0f1a;
-            box-shadow: 0 2px 8px rgba(245,158,11,0.4);
-        }
-
-        /* Edit cell */
         .edit-cell {
             cursor: pointer;
+            padding: 10px 6px;
+            border-radius: var(--radius-xs);
+            transition: background 0.2s;
             display: block;
-            padding: 6px 4px;
-            border-radius: 6px;
-            transition: background 0.15s;
-            font-size: 12px;
+            min-height: 44px;
             line-height: 1.4;
         }
-        .edit-cell:hover { background: var(--surface-hover); }
-        .edit-cell:active { background: rgba(245,158,11,0.2); }
+        .edit-cell:hover { background: rgba(99, 102, 241, 0.08); }
         .edit-cell.editing {
-            background: rgba(245,158,11,0.15);
-            outline: 2px solid var(--warning);
+            background: rgba(245, 158, 11, 0.1);
+            outline: 2px solid rgba(245, 158, 11, 0.3);
             outline-offset: -1px;
         }
-
-        @media (hover: none) {
-            .edit-cell:hover { background: inherit; }
+        .edit-cell.tap-hint::after {
+            content: ' ✏️';
+            font-size: 8px;
+            opacity: 0.35;
         }
 
-        /* ── Footer ── */
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: var(--text-3);
-            font-size: 12px;
-            letter-spacing: 0.3px;
-        }
-
-        /* ── Spinner ── */
-        #saveSpinner {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(6px);
-            z-index: 200;
-            justify-content: center;
-            align-items: center;
-        }
-        #saveSpinner.active { display: flex; }
-
-        .spinner-box {
-            background: var(--bg-2);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius);
-            padding: 32px 44px;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-        }
-        .spinner-ring {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-strong);
-            border-top-color: var(--success);
-            border-radius: 50%;
-            animation: spin 0.75s linear infinite;
-            margin: 0 auto 16px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner-text {
-            font-size: 14px;
-            color: var(--text-2);
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        }
-
-        /* ── Modal ── */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 24px 16px;
-            overflow-y: auto;
-        }
-        .modal.active { display: flex; }
-
+        .modal { padding-top: 0; align-items: stretch; }
         .modal-content {
-            background: var(--bg-2);
-            border: 1px solid var(--border-strong);
-            border-radius: var(--radius);
+            border-radius: 0;
             width: 100%;
-            max-width: 440px;
-            margin: auto;
-            padding: 24px;
-            box-shadow: var(--shadow-lg);
-            animation: modalIn 0.22s ease;
-        }
-        @keyframes modalIn {
-            from { opacity: 0; transform: translateY(-12px) scale(0.98); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .modal-header {
+            max-width: none;
+            margin: 0;
+            padding: 24px 20px;
+            min-height: 100vh;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 22px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+            flex-direction: column;
+            justify-content: center;
+            border: none;
+            box-shadow: none;
         }
-
-        .modal-header h2 {
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.2px;
-        }
-
-        .close-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text-3);
-            font-size: 18px;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 6px;
-            line-height: 1;
-            transition: all 0.15s;
-        }
-        .close-btn:hover {
-            background: var(--danger);
-            border-color: var(--danger);
-            color: white;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-3);
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-        }
-        .form-group input,
-        .form-group select {
-            width: 100%;
-        }
-
-        .form-group input[readonly] {
-            background: rgba(255,255,255,0.03);
-            color: var(--text-2);
-            cursor: default;
-            border-color: var(--border);
-        }
-
-        /* Admin Panel buttons */
-        #adminModal .modal-content > div > button {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            padding: 13px 18px;
+        .modal-content h2 { font-size: 17px; }
+        .form-group input, .form-group select {
+            min-height: 48px;
             font-size: 14px;
-            text-align: left;
+            padding: 12px;
         }
 
-        /* Persons / Units lists inline */
-        #personsList, #unitsList {
-            max-height: 50vh;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: var(--border-strong) transparent;
-        }
-        #personsList::-webkit-scrollbar,
-        #unitsList::-webkit-scrollbar { width: 5px; }
-        #personsList::-webkit-scrollbar-thumb,
-        #unitsList::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
-
-        /* Toggle row */
-        .toggle-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
+        .controls button, .btn-primary, .btn-success, .btn-danger, .btn-warning {
+            min-height: 48px;
+            padding: 12px 16px;
+            font-size: 13px;
         }
 
-        /* ── Mobile ── */
-        @media (max-width: 640px) {
-            body { padding: 8px; }
+        .close-btn { padding: 8px; font-size: 20px; }
+        .week-separator { font-size: 10px; padding: 8px 12px !important; }
+        .badge { font-size: 7px; padding: 2px 7px; }
+        .footer { font-size: 10px; padding: 14px 16px; }
+    }
 
-            .header { padding: 14px 16px; }
-            .header h1 { font-size: 17px; }
-            .header-icon { width: 36px; height: 36px; font-size: 17px; }
-            .header-subtitle { display: none; }
-            .admin-btn { padding: 8px 12px; font-size: 12px; }
+    #personsList::-webkit-scrollbar { width: 6px; }
+    #personsList::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.3); border-radius: 3px; }
+    #personsList::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.15); border-radius: 3px; }
+    #personsList::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.3); }
 
-            .controls {
-                padding: 12px 14px;
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-
-            select, input[type="date"] { font-size: 16px; min-height: 44px; }
-
-            th, td { padding: 9px 4px; font-size: 11px; }
-            td:first-child, th:first-child { min-width: 110px; padding-left: 10px; }
-
-            .modal { padding: 0; align-items: stretch; }
-            .modal-content {
-                border-radius: 0;
-                width: 100%;
-                max-width: none;
-                margin: 0;
-                min-height: 100dvh;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }
-
-            .edit-cell {
-                min-height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .edit-cell.tap-hint::after {
-                content: ' ✏️';
-                font-size: 9px;
-                opacity: 0.4;
-            }
-
-            .btn-primary, .btn-success, .btn-danger, .btn-warning {
-                min-height: 48px;
-                padding: 13px 18px;
-            }
-
-            .close-btn { padding: 8px 12px; font-size: 20px; }
-
-            .info-panel { padding: 12px 14px; gap: 4px 14px; font-size: 12px; }
-        }
-
-        @media (max-width: 400px) {
-            .controls { grid-template-columns: 1fr; }
-        }
-    </style>
+    /* Print Styles */
+    @media print {
+        body { background: white !important; padding: 0; }
+        body::before { display: none; }
+        .controls, .info-panel, .admin-btn, .header-buttons, .footer { display: none !important; }
+        .container { box-shadow: none !important; border: none !important; background: white !important; }
+        table { font-size: 10px; border-color: #ddd; }
+        th { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color: #333 !important; }
+        td:first-child, th:first-child { background: white !important; }
+        .izinli-cell { background: #fce4ec !important; color: #c62828 !important; text-shadow: none; }
+        .izinli-cell::before { display: none; }
+        .row-today { background: #e8f5e9 !important; }
+        .row-tomorrow { background: #fff8e1 !important; }
+        .badge-today, .badge-tomorrow { background: #666 !important; color: white !important; }
+        .header { background: #f5f5f5 !important; border-bottom: 2px solid #333 !important; }
+        .header h1 { background: none; -webkit-text-fill-color: #333; color: #333; }
+        .header h1 span { background: none; -webkit-text-fill-color: #333; color: #333; }
+        .header::before, .header::after { display: none; }
+    }
+</style>
 </head>
 <body>
 
@@ -667,39 +814,31 @@
 
 <div class="container">
     <div class="header">
-        <div class="header-left">
-            <div class="header-icon">📅</div>
-            <div>
-                <h1>Vardiya Takvimi</h1>
-                <div class="header-subtitle">Personel Çalışma Programı</div>
-            </div>
-        </div>
+        <h1><span>Vardiya</span> Takvimi</h1>
         <div id="headerButtons"></div>
     </div>
 
     <div class="controls">
-        <div class="control-group">
-            <label for="datePicker">Tarih</label>
-            <div class="control-inner">
-                <input type="date" id="datePicker">
-                <button class="btn-primary" onclick="goToToday()" style="flex-shrink:0">Bugün</button>
-            </div>
+        <div class="control-row">
+            <label for="datePicker">Tarih:</label>
+            <input type="date" id="datePicker">
+            <button class="btn-primary" onclick="goToToday()">Bugün</button>
         </div>
-        <div class="control-group">
-            <label for="viewMode">Görünüm</label>
+        <div class="control-row">
+            <label for="viewMode">Görünüm:</label>
             <select id="viewMode">
                 <option value="month" selected>4 Hafta</option>
                 <option value="week">Bu Hafta</option>
             </select>
         </div>
-        <div class="control-group">
-            <label for="unitFilter">Birim</label>
+        <div class="control-row">
+            <label for="unitFilter">Birim:</label>
             <select id="unitFilter">
                 <option value="all">Tüm Birimler</option>
             </select>
         </div>
-        <div class="control-group">
-            <label for="personFilter">Kişi</label>
+        <div class="control-row">
+            <label for="personFilter">Kişi:</label>
             <select id="personFilter">
                 <option value="all">Tüm Kişiler</option>
             </select>
@@ -713,27 +852,28 @@
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
         </table>
-        <div class="footer">Created by İlhan Akdeniz</div>
     </div>
+
+    <div class="footer">Created by İlhan Akdeniz</div>
 </div>
 
 <!-- Login Modal -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>🔐 Yönetici Girişi</h2>
+            <h2>Yönetici Girişi</h2>
             <button class="close-btn" onclick="closeLoginModal()">&times;</button>
         </div>
         <div class="form-group">
-            <label>Kullanıcı Adı</label>
+            <label>Kullanıcı Adı:</label>
             <input type="text" id="loginUser" placeholder="admin">
         </div>
         <div class="form-group">
-            <label>Şifre</label>
+            <label>Şifre:</label>
             <input type="password" id="loginPass" placeholder="••••••">
         </div>
-        <button class="btn-primary" onclick="doLogin()" style="width:100%;margin-top:4px">Giriş Yap</button>
-        <p id="loginError" style="color:#f87171;text-align:center;margin-top:12px;display:none;font-size:13px">Hatalı kullanıcı adı veya şifre!</p>
+        <button class="btn-primary" onclick="doLogin()" style="width:100%">Giriş Yap</button>
+        <p id="loginError" style="color:red;text-align:center;margin-top:10px;display:none">Hatalı giriş!</p>
     </div>
 </div>
 
@@ -741,19 +881,19 @@
 <div class="modal" id="editModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>✏️ Vardiya Düzenle</h2>
+            <h2>Vardiya Düzenle</h2>
             <button class="close-btn" onclick="closeEditModal()">&times;</button>
         </div>
         <div class="form-group">
-            <label>Tarih</label>
-            <input type="text" id="editDate" readonly>
+            <label>Tarih:</label>
+            <input type="text" id="editDate" readonly style="background:rgba(15,23,42,0.5);color:#94a3b8">
         </div>
         <div class="form-group">
-            <label>Kişi</label>
-            <input type="text" id="editPerson" readonly>
+            <label>Kişi:</label>
+            <input type="text" id="editPerson" readonly style="background:rgba(15,23,42,0.5);color:#94a3b8">
         </div>
         <div class="form-group">
-            <label>Vardiya</label>
+            <label>Vardiya:</label>
             <select id="editShift">
                 <option value="08.30-17.30">08.30-17.30</option>
                 <option value="13.30-20.30">13.30-20.30</option>
@@ -780,10 +920,10 @@
 <div class="modal" id="adminModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>⚙️ Yönetici Paneli</h2>
+            <h2>Yönetici Paneli</h2>
             <button class="close-btn" onclick="closeAdminModal()">&times;</button>
         </div>
-        <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-direction:column;gap:12px">
             <button class="btn-success" onclick="downloadBackup()">📥 Yedek İndir</button>
             <button class="btn-warning" onclick="document.getElementById('restoreFile').click()">📤 Yedek Yükle</button>
             <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
@@ -798,14 +938,14 @@
 <div class="modal" id="unitsModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>🏢 Birim Yönetimi</h2>
+            <h2>Birim Yönetimi</h2>
             <button class="close-btn" onclick="closeUnitsModal()">&times;</button>
         </div>
-        <div id="unitsList" style="margin-bottom:15px"></div>
-        <div style="border-top:1px solid var(--border);padding-top:16px">
-            <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Yeni Birim Ekle</h3>
+        <div style="max-height:50vh;overflow-y:auto;margin-bottom:15px" id="unitsList"></div>
+        <div style="border-top:1px solid rgba(148,163,184,0.12);padding-top:15px">
+            <h3 style="margin:0 0 10px 0;font-size:16px;color:#f1f5f9">Yeni Birim Ekle</h3>
             <div class="form-group">
-                <label>Birim Adı</label>
+                <label>Birim Adı:</label>
                 <input type="text" id="newUnitName" placeholder="Ör: ÇAKABEY-KİLİSE">
             </div>
             <button class="btn-success" onclick="addNewUnit()" style="width:100%">Birim Ekle</button>
@@ -817,17 +957,17 @@
 <div class="modal" id="editUnitModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>🏢 Birim Düzenle</h2>
+            <h2>Birim Düzenle</h2>
             <button class="close-btn" onclick="closeEditUnitModal()">&times;</button>
         </div>
         <input type="hidden" id="editUnitIndex">
         <div class="form-group">
-            <label>Birim Adı</label>
+            <label>Birim Adı:</label>
             <input type="text" id="editUnitName">
         </div>
         <div class="form-group">
-            <label>Döngü (hafta)</label>
-            <select id="editUnitCycle">
+            <label>Döngü (hafta):</label>
+            <select id="editUnitCycle" style="width:100%;padding:8px;border:1px solid rgba(148,163,184,0.15);border-radius:6px;background:rgba(15,23,42,0.6);color:#f1f5f9">
                 <option value="1">1 Hafta</option>
                 <option value="2">2 Hafta</option>
                 <option value="3">3 Hafta</option>
@@ -846,23 +986,23 @@
 <div class="modal" id="personsModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>👥 Kişi Yönetimi</h2>
+            <h2>Kişi Yönetimi</h2>
             <button class="close-btn" onclick="closePersonsModal()">&times;</button>
         </div>
-        <div id="personsList" style="margin-bottom:15px"></div>
-        <div style="border-top:1px solid var(--border);padding-top:16px">
-            <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Yeni Kişi Ekle</h3>
+        <div style="max-height:60vh;overflow-y:auto;margin-bottom:15px" id="personsList"></div>
+        <div style="border-top:1px solid rgba(148,163,184,0.12);padding-top:15px">
+            <h3 style="margin:0 0 10px 0;font-size:16px;color:#f1f5f9">Yeni Kişi Ekle</h3>
             <div class="form-group">
-                <label>Ad Soyad</label>
+                <label>Ad Soyad:</label>
                 <input type="text" id="newPersonName" placeholder="Ör: Ahmet Yılmaz">
             </div>
             <div class="form-group">
-                <label>Kısa Ad</label>
+                <label>Kısa Ad:</label>
                 <input type="text" id="newPersonShort" placeholder="Ör: Ahmet">
             </div>
             <div class="form-group">
-                <label>Birim</label>
-                <select id="newPersonUnit">
+                <label>Birim:</label>
+                <select id="newPersonUnit" style="width:100%;padding:8px;border:1px solid rgba(148,163,184,0.15);border-radius:4px;background:rgba(15,23,42,0.6);color:#f1f5f9">
                     <option value="">Birim Seçin...</option>
                 </select>
             </div>
@@ -875,21 +1015,21 @@
 <div class="modal" id="editPersonModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>👤 Kişi Düzenle</h2>
+            <h2>Kişi Düzenle</h2>
             <button class="close-btn" onclick="closeEditPersonModal()">&times;</button>
         </div>
         <input type="hidden" id="editPersonKey">
         <div class="form-group">
-            <label>Ad Soyad</label>
+            <label>Ad Soyad:</label>
             <input type="text" id="editPersonName">
         </div>
         <div class="form-group">
-            <label>Kısa Ad</label>
+            <label>Kısa Ad:</label>
             <input type="text" id="editPersonShort">
         </div>
         <div class="form-group">
-            <label>Birim</label>
-            <select id="editPersonUnit">
+            <label>Birim:</label>
+            <select id="editPersonUnit" style="width:100%;padding:8px;border:1px solid rgba(148,163,184,0.15);border-radius:4px;background:rgba(15,23,42,0.6);color:#f1f5f9">
                 <option value="">Birim Seçin...</option>
             </select>
         </div>
@@ -1013,6 +1153,7 @@ function init() {
     today.setHours(0,0,0,0);
     datePicker.value = formatDateForInput(today);
 
+    // Restore last selected unit from localStorage
     const savedUnit = localStorage.getItem('vardiya_unit') || 'ÇAKABEY-KİLİSE';
     unitFilter.value = savedUnit;
 
@@ -1085,7 +1226,7 @@ function renderSchedule() {
     const personKeys = Object.keys(persons);
 
     // Header
-    let headerHTML = '<tr><th>TARİH / GÜN</th>';
+    let headerHTML = '<tr><th>TARİH/GÜN</th>';
     personKeys.forEach(key => {
         const personUnit = persons[key].unit || '';
         const showByPerson = filterVal === 'all' || filterVal === key;
@@ -1129,13 +1270,13 @@ function renderSchedule() {
             const endStr = `${endOfWeek.getDate()} ${monthNames[endOfWeek.getMonth()]}`;
 
             let trSep = document.createElement('tr');
-            trSep.innerHTML = `<td colspan="${visibleColsCount}" class="week-separator">📅 ${startStr} — ${endStr} &nbsp;·&nbsp; ${weekIndex + 1}. Hafta</td>`;
+            trSep.innerHTML = `<td colspan="${visibleColsCount}" class="week-separator">📅 ${startStr} - ${endStr}</td>`;
             tableBody.appendChild(trSep);
 
             if (idx > 0) {
                 let trSub = document.createElement('tr');
                 trSub.className = 'sub-header';
-                let subHtml = '<th>TARİH / GÜN</th>';
+                let subHtml = '<th>TARİH/GÜN</th>';
                 personKeys.forEach(key => {
                     const personUnit = persons[key].unit || '';
                     const showByPerson = filterVal === 'all' || filterVal === key;
@@ -1161,10 +1302,10 @@ function renderSchedule() {
 
             if (isToday) {
                 trClass = 'row-today';
-                dateBadge = '<span class="badge badge-today">BUGÜN</span>';
+                dateBadge = '<div class="badge badge-today">BUGÜN</div>';
             } else if (isTomorrow) {
                 trClass = 'row-tomorrow';
-                dateBadge = '<span class="badge badge-tomorrow">YARIN</span>';
+                dateBadge = '<div class="badge badge-tomorrow">YARIN</div>';
             }
 
             const dayName = dayNames[rowDate.getDay()];
@@ -1173,7 +1314,7 @@ function renderSchedule() {
             let tr = document.createElement('tr');
             if (trClass) tr.className = trClass;
 
-            let html = `<td><strong>${formattedDateStr}</strong><br><span style="color:var(--text-3);font-size:11px">${dayName}</span>${dateBadge}</td>`;
+            let html = `<td><strong>${formattedDateStr}</strong><br>${dayName} ${dateBadge}</td>`;
 
             personKeys.forEach(key => {
                 const personUnit = persons[key].unit || '';
@@ -1206,24 +1347,24 @@ function renderSchedule() {
     });
 
     // Info panel
-    let infoHtml = `<span><strong>Birim:</strong> ${unitVal === 'all' ? 'Tüm Birimler' : unitVal}</span>`;
+    let infoHtml = `<strong>Birim:</strong> ${unitVal === 'all' ? 'Tüm Birimler' : unitVal}<br>`;
     const wIndex = calculateWeekIndex(selectedDate, unitVal);
     infoHtml += mode === 'week'
-        ? `<span><strong>Görüntülenen:</strong> ${wIndex + 1}. Hafta</span>`
-        : `<span><strong>Görüntülenen:</strong> 4 Haftalık Döngü</span>`;
+        ? `<strong>Görüntülenen:</strong> ${wIndex + 1}. Hafta<br>`
+        : `<strong>Görüntülenen:</strong> 4 Haftalık Döngü<br>`;
 
     if (bugunIzinliler.length > 0) {
-        infoHtml += `<span>🟢 <strong>Bugün İzinli:</strong> <span class="izinli-text">${bugunIzinliler.join(', ')}</span></span>`;
+        infoHtml += `<div style="margin-top:5px">🟢 <strong>Bugün İzinli:</strong> <span class="izinli-text">${bugunIzinliler.join(', ')}</span></div>`;
     } else {
-        infoHtml += `<span>🟢 <strong>Bugün İzinli:</strong> Yok</span>`;
+        infoHtml += `<div style="margin-top:5px">🟢 <strong>Bugün İzinli:</strong> Yok</div>`;
     }
 
     if (yarinIzinliler.length > 0) {
-        infoHtml += `<span>🟡 <strong>Yarın İzinli:</strong> <span class="izinli-text">${yarinIzinliler.join(', ')}</span></span>`;
+        infoHtml += `<div style="margin-top:4px">🟡 <strong>Yarın İzinli:</strong> <span class="izinli-text">${yarinIzinliler.join(', ')}</span></div>`;
     }
 
     if (isAdmin) {
-        infoHtml += `<span style="color:var(--primary);font-size:12px">✏️ Düzenlemek için hücreye çift tıklayın</span>`;
+        infoHtml += `<div style="margin-top:8px;color:#818cf8;font-size:13px">✏️ Düzenlemek için hücreye çift tıklayın</div>`;
     }
 
     infoPanel.innerHTML = infoHtml;
@@ -1366,7 +1507,7 @@ async function saveEdit() {
         personKeys.forEach(k => scheduleData[week].days[day][k] = '-');
     }
 
-    const personFilterEl = document.getElementById('personFilter');
+    const personFilter = document.getElementById('personFilter');
     const allPersons = Object.keys(persons);
     for (const p of allPersons) {
         if (!scheduleData[week].days[day][p]) {
@@ -1441,12 +1582,12 @@ function renderPersonsList() {
     let html = '<div style="display:flex;flex-direction:column;gap:8px">';
     Object.keys(persons).forEach(key => {
         const p = persons[key];
-        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm)">
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(15,23,42,0.5);border-radius:6px;border:1px solid rgba(148,163,184,0.06)">
             <div>
-                <div style="font-weight:600;color:var(--text)">${p.name}</div>
-                <div style="font-size:12px;color:var(--text-3);margin-top:2px">Kısa: ${p.shortName} · Birim: ${p.unit || '—'}</div>
+                <div style="font-weight:600;color:#f1f5f9">${p.name}</div>
+                <div style="font-size:12px;color:#94a3b8">Kısa: ${p.shortName} | Birim: ${p.unit || '-'}</div>
             </div>
-            <button onclick="openEditPersonModal('${key}')" style="background:var(--primary);color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600">Düzenle</button>
+            <button onclick="openEditPersonModal('${key}')" style="background:#6366f1;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:500">Düzenle</button>
         </div>`;
     });
     html += '</div>';
@@ -1478,6 +1619,7 @@ function savePersonEdit() {
         return;
     }
 
+    // Update person data, preserving schedule data
     persons[key] = { name, shortName, unit: unit || undefined };
     showSpinner();
     saveData().then(() => {
@@ -1492,8 +1634,10 @@ function deletePerson() {
     const key = document.getElementById('editPersonKey').value;
     if (!confirm(`"${persons[key].name}" kişisini silmek istediğinize emin misiniz?\n\nNot: Bu kişinin vardiya kayıtları kalacaktır.`)) return;
 
+    // Remove from persons
     delete persons[key];
 
+    // Remove from all schedule data
     scheduleData.forEach(week => {
         week.days.forEach(day => {
             delete day[key];
@@ -1520,6 +1664,7 @@ function addNewPerson() {
         return;
     }
 
+    // Generate unique key from shortName
     let key = shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
     let originalKey = key;
     let counter = 1;
@@ -1530,6 +1675,7 @@ function addNewPerson() {
 
     persons[key] = { name, shortName, unit: unit || undefined };
 
+    // Initialize new person in all existing schedule days with '-'
     scheduleData.forEach(week => {
         week.days.forEach(day => {
             if (!day[key]) day[key] = '-';
@@ -1566,12 +1712,9 @@ function renderUnitsList() {
     const list = document.getElementById('unitsList');
     let html = '<div style="display:flex;flex-direction:column;gap:8px">';
     units.forEach((unit, index) => {
-        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm)">
-            <div>
-                <strong style="color:var(--text)">${unit.name}</strong>
-                <span style="color:var(--text-3);font-size:12px;margin-left:8px">${unit.cycle} hafta döngü</span>
-            </div>
-            <button onclick="openEditUnitModal(${index})" style="background:var(--primary);color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600">Düzenle</button>
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(15,23,42,0.5);border-radius:6px;border:1px solid rgba(148,163,184,0.06)">
+            <div><strong style="color:#f1f5f9">${unit.name}</strong> <span style="color:#94a3b8;font-size:12px">(${unit.cycle} hafta döngü)</span></div>
+            <button onclick="openEditUnitModal(${index})" style="background:#6366f1;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;font-weight:500">Düzenle</button>
         </div>`;
     });
     html += '</div>';
