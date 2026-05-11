@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Vardiya Takvimi</title>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --success: #198754;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --bg-color: #f8f9fa;
+            --header-bg: #f2e699;
+            --table-border: #dee2e6;
+            --izinli-bg: #e06666;
+            --today-bg: #d1e7dd;
+            --tomorrow-bg: #fff3cd;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            margin: 0;
+            padding: 10px;
+            color: #333;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--header-bg);
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .admin-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.1);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .controls {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .control-row label {
+            min-width: 60px;
+            font-weight: 600;
+        }
+
+        select, input[type="date"], input[type="password"], input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: black; }
+
+        button:active { transform: scale(0.98); }
+
+        .info-panel {
+            background: #e9ecef;
+            padding: 15px;
+            margin: 0 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .izinli-text { color: var(--danger); font-weight: 600; }
+
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: center;
+            min-width: 600px;
+        }
+
+        th, td {
+            border: 1px solid var(--table-border);
+            padding: 12px 6px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: var(--header-bg);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        td:first-child, th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background: #fff;
+        }
+
+        th:first-child { z-index: 3; }
+
+        .week-separator {
+            background: #e2e3e5;
+            font-weight: 600;
+            text-align: left;
+            padding-left: 15px !important;
+            font-size: 13px;
+        }
+
+        .izinli-cell {
+            background: var(--izinli-bg) !important;
+            color: white;
+            font-weight: 600;
+        }
+
+        .row-today { background: var(--today-bg); }
+        .row-today td:first-child { background: var(--today-bg); border-left: 4px solid #0f5132; }
+        .row-tomorrow { background: var(--tomorrow-bg); }
+        .row-tomorrow td:first-child { background: var(--tomorrow-bg); border-left: 4px solid #856404; }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .badge-today { background: #0f5132; color: white; }
+        .badge-tomorrow { background: #856404; color: white; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active { display: flex; }
+
+        /* Spinner */
+        #saveSpinner {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        #saveSpinner.active { display: flex; }
+        .spinner-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        .spinner-ring {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top-color: var(--success);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-text { font-size: 16px; color: #333; font-weight: 600; }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 450px;
+            margin: 10px auto;
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 { margin: 0; font-size: 18px; }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+        }
+
+        .edit-cell {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .edit-cell:hover { background: #e9ecef; }
+        .edit-cell:active { background: #fff3cd; }
+        .edit-cell.editing {
+            background: #fff3cd;
+            outline: 2px solid var(--warning);
+        }
+
+        /* Touch cihazlar için hover states kaldır */
+        @media (hover: none) {
+            .edit-cell:hover { background: inherit; }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 13px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Touch-friendly switches for mobile */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 5px; }
+            .header h1 { font-size: 18px; }
+            .admin-btn { padding: 6px 10px; font-size: 12px; }
+            .controls { padding: 10px; gap: 8px; }
+            .control-row { flex-wrap: wrap; }
+            .control-row label { width: 100%; margin-bottom: 5px; }
+            select, input[type="date"] { font-size: 16px; min-height: 44px; }
+            th, td { padding: 10px 4px; font-size: 12px; }
+            .table-wrapper { padding: 10px 5px; }
+
+            /* Mobilde tek tıklama ile düzenleme */
+            .edit-cell {
+                cursor: pointer;
+                padding: 12px 8px;
+                border-radius: 8px;
+                transition: background 0.2s;
+                display: block;
+                min-height: 44px;
+                line-height: 1.4;
+            }
+            .edit-cell:hover { background: #e9ecef; }
+            .edit-cell.editing {
+                background: #fff3cd;
+                outline: 2px solid var(--warning);
+                outline-offset: -2px;
+            }
+            .edit-cell.tap-hint::after {
+                content: ' ✏️';
+                font-size: 10px;
+                opacity: 0.5;
+            }
+
+            /* Mobil modal iyileştirmeleri */
+            .modal { padding-top: 0; align-items: stretch; }
+            .modal-content {
+                border-radius: 0;
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                padding: 20px;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .modal-content h2 { font-size: 20px; }
+            .form-group input, .form-group select {
+                min-height: 48px;
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            /* Mobilde butonlar daha büyük */
+            .controls button, .btn-primary, .btn-success, .btn-danger, .btn-warning {
+                min-height: 48px;
+                padding: 14px 20px;
+            }
+
+            /* Mobilde kapatma butonu daha büyük */
+            .close-btn { padding: 10px; font-size: 28px; }
+        }
+
+        /* Persons modal scrollbar */
+        #personsList::-webkit-scrollbar { width: 6px; }
+        #personsList::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
+        #personsList::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        #personsList::-webkit-scrollbar-thumb:hover { background: #999; }
+    </style>
+</head>
+<body>
+
+<div id="saveSpinner">
+    <div class="spinner-box">
+        <div class="spinner-ring"></div>
+        <div class="spinner-text">Kaydediliyor...</div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>Vardiya Takvimi</h1>
+        <div id="headerButtons"></div>
+    </div>
+
+    <div class="controls">
+        <div class="control-row">
+            <label for="datePicker">Tarih:</label>
+            <input type="date" id="datePicker">
+            <button class="btn-primary" onclick="goToToday()">Bugün</button>
+        </div>
+        <div class="control-row">
+            <label for="viewMode">Görünüm:</label>
+            <select id="viewMode">
+                <option value="month" selected>4 Hafta</option>
+                <option value="week">Bu Hafta</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label for="unitFilter">Birim:</label>
+            <select id="unitFilter">
+                <option value="all">Tüm Birimler</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label for="personFilter">Kişi:</label>
+            <select id="personFilter">
+                <option value="all">Tüm Kişiler</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="info-panel" id="infoPanel"></div>
+
+    <div class="table-wrapper">
+        <table id="scheduleTable">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="footer">Created by İlhan Akdeniz</div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal" id="loginModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Yönetici Girişi</h2>
+            <button class="close-btn" onclick="closeLoginModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>Kullanıcı Adı:</label>
+            <input type="text" id="loginUser" placeholder="admin">
+        </div>
+        <div class="form-group">
+            <label>Şifre:</label>
+            <input type="password" id="loginPass" placeholder="••••••">
+        </div>
+        <button class="btn-primary" onclick="doLogin()" style="width:100%">Giriş Yap</button>
+        <p id="loginError" style="color:red;text-align:center;margin-top:10px;display:none">Hatalı giriş!</p>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Vardiya Düzenle</h2>
+            <button class="close-btn" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="form-group">
+            <label>Tarih:</label>
+            <input type="text" id="editDate" readonly style="background:#eee">
+        </div>
+        <div class="form-group">
+            <label>Kişi:</label>
+            <input type="text" id="editPerson" readonly style="background:#eee">
+        </div>
+        <div class="form-group">
+            <label>Vardiya:</label>
+            <select id="editShift">
+                <option value="08.30-17.30">08.30-17.30</option>
+                <option value="13.30-20.30">13.30-20.30</option>
+                <option value="10.00-19.00">10.00-19.00</option>
+                <option value="İZİNLİ">İZİNLİ</option>
+                <option value="08.30-17.30 (OFİS)">08.30-17.30 (OFİS)</option>
+                <option value="08.30-17.30 (ÇAKABEY)">08.30-17.30 (ÇAKABEY)</option>
+                <option value="08.30-17.30 (KİLİSE)">08.30-17.30 (KİLİSE)</option>
+                <option value="13.30-20.30 (ÇAKABEY)">13.30-20.30 (ÇAKABEY)</option>
+                <option value="13.30-20.30 (KİLİSE)">13.30-20.30 (KİLİSE)</option>
+                <option value="10.00-19.00 (KİLİSE)">10.00-19.00 (KİLİSE)</option>
+            </select>
+        </div>
+        <input type="hidden" id="editWeek">
+        <input type="hidden" id="editDay">
+        <div style="display:flex;gap:10px;margin-top:20px">
+            <button class="btn-success" onclick="saveEdit()" style="flex:1">Kaydet</button>
+            <button class="btn-danger" onclick="closeEditModal()" style="flex:1">İptal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Admin Panel Modal -->
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Yönetici Paneli</h2>
+            <button class="close-btn" onclick="closeAdminModal()">&times;</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+            <button class="btn-success" onclick="downloadBackup()">📥 Yedek İndir</button>
+            <button class="btn-warning" onclick="document.getElementById('restoreFile').click()">📤 Yedek Yükle</button>
+            <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
+            <button class="btn-primary" onclick="openUnitsModal()">🏢 Birim Yönetimi</button>
+            <button class="btn-primary" onclick="openPersonsModal()">👥 Kişi Yönetimi</button>
+            <button class="btn-danger" onclick="logoutAdmin()">🔓 Oturumu Kapat</button>
+        </div>
+    </div>
+</div>
+
+<!-- Units Management Modal -->
+<div class="modal" id="unitsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Birim Yönetimi</h2>
+            <button class="close-btn" onclick="closeUnitsModal()">&times;</button>
+        </div>
+        <div style="max-height:50vh;overflow-y:auto;margin-bottom:15px" id="unitsList"></div>
+        <div style="border-top:1px solid #eee;padding-top:15px">
+            <h3 style="margin:0 0 10px 0;font-size:16px">Yeni Birim Ekle</h3>
+            <div class="form-group">
+                <label>Birim Adı:</label>
+                <input type="text" id="newUnitName" placeholder="Ör: ÇAKABEY-KİLİSE">
+            </div>
+            <button class="btn-success" onclick="addNewUnit()" style="width:100%">Birim Ekle</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Unit Modal -->
+<div class="modal" id="editUnitModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Birim Düzenle</h2>
+            <button class="close-btn" onclick="closeEditUnitModal()">&times;</button>
+        </div>
+        <input type="hidden" id="editUnitIndex">
+        <div class="form-group">
+            <label>Birim Adı:</label>
+            <input type="text" id="editUnitName">
+        </div>
+        <div class="form-group">
+            <label>Döngü (hafta):</label>
+            <select id="editUnitCycle" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px">
+                <option value="1">1 Hafta</option>
+                <option value="2">2 Hafta</option>
+                <option value="3">3 Hafta</option>
+                <option value="4">4 Hafta</option>
+            </select>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+            <button class="btn-success" onclick="saveUnitEdit()" style="flex:1">Kaydet</button>
+            <button class="btn-danger" onclick="deleteUnit()" style="flex:1">Sil</button>
+            <button class="btn-warning" onclick="closeEditUnitModal()" style="flex:1">İptal</button>
+        </div>
+    </div>
+</div>
+
+<!-- Persons Management Modal -->
+<div class="modal" id="personsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Kişi Yönetimi</h2>
+            <button class="close-btn" onclick="closePersonsModal()">&times;</button>
+        </div>
+        <div style="max-height:60vh;overflow-y:auto;margin-bottom:15px" id="personsList"></div>
+        <div style="border-top:1px solid #eee;padding-top:15px">
+            <h3 style="margin:0 0 10px 0;font-size:16px">Yeni Kişi Ekle</h3>
+            <div class="form-group">
+                <label>Ad Soyad:</label>
+                <input type="text" id="newPersonName" placeholder="Ör: Ahmet Yılmaz">
+            </div>
+            <div class="form-group">
+                <label>Kısa Ad:</label>
+                <input type="text" id="newPersonShort" placeholder="Ör: Ahmet">
+            </div>
+            <div class="form-group">
+                <label>Birim:</label>
+                <select id="newPersonUnit" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px">
+                    <option value="">Birim Seçin...</option>
+                </select>
+            </div>
+            <button class="btn-success" onclick="addNewPerson()" style="width:100%">Kişi Ekle</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Person Modal -->
+<div class="modal" id="editPersonModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Kişi Düzenle</h2>
+            <button class="close-btn" onclick="closeEditPersonModal()">&times;</button>
+        </div>
+        <input type="hidden" id="editPersonKey">
+        <div class="form-group">
+            <label>Ad Soyad:</label>
+            <input type="text" id="editPersonName">
+        </div>
+        <div class="form-group">
+            <label>Kısa Ad:</label>
+            <input type="text" id="editPersonShort">
+        </div>
+        <div class="form-group">
+            <label>Birim:</label>
+            <select id="editPersonUnit" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px">
+                <option value="">Birim Seçin...</option>
+            </select>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:20px">
+            <button class="btn-success" onclick="savePersonEdit()" style="flex:1">Kaydet</button>
+            <button class="btn-danger" onclick="deletePerson()" style="flex:1">Sil</button>
+            <button class="btn-warning" onclick="closeEditPersonModal()" style="flex:1">İptal</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvgXLTKbcwbf4lDJuZ2Gaam4h3pxktcDDN4ShgIFO1pB_MboeYjDkKIKyq0fSyfdLU/exec";
+
+const ANCHOR_DATE = new Date(2026, 2, 23);
+const dayNames = ["PAZAR","PAZARTESİ","SALI","ÇARŞAMBA","PERŞEMBE","CUMA","CUMARTESİ"];
+const monthNames = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+
+let scheduleData = [];
+let persons = {};
+let isAdmin = localStorage.getItem('vardiya_admin') === 'true';
+let units = [{name:'ÇAKABEY-KİLİSE', cycle:3}, {name:'OFİS', cycle:1}];
+
+const datePicker = document.getElementById('datePicker');
+const viewMode = document.getElementById('viewMode');
+const unitFilter = document.getElementById('unitFilter');
+const personFilter = document.getElementById('personFilter');
+const tableHead = document.getElementById('tableHead');
+const tableBody = document.getElementById('tableBody');
+const infoPanel = document.getElementById('infoPanel');
+
+async function loadData() {
+    try {
+        const res = await fetch(SCRIPT_URL);
+        if (res.ok) {
+            const data = await res.json();
+            persons = data.persons || {};
+            scheduleData = data.schedule || [];
+            units = data.units?.map(u => typeof u === 'string' ? {name: u, cycle: 3} : u) || [{name:'ÇAKABEY-KİLİSE', cycle:3}, {name:'OFİS', cycle:1}];
+        } else {
+            throw new Error('Dosya bulunamadı');
+        }
+    } catch(e) {
+        persons = {
+            dilek: { name: "Dilek Karaoğlu", shortName: "Dilek" },
+            ilhan: { name: "İlhan Akdeniz", shortName: "İlhan" },
+            nilufer: { name: "Nilüfer Eriş", shortName: "Nilüfer" },
+            huseyin: { name: "Hüseyin Bağcı", shortName: "Hüseyin" },
+            recep: { name: "Recep Demir", shortName: "Recep" }
+        };
+        scheduleData = [
+            { name: "1. Hafta", days: [
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '13.30-20.30', recep: 'İZİNLİ' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '13.30-20.30', recep: 'İZİNLİ' },
+                { dilek: '08.30-17.30', ilhan: 'İZİNLİ', nilufer: '08.30-17.30', huseyin: '13.30-20.30', recep: '13.30-20.30 (ÇAKABEY)' },
+                { dilek: '08.30-17.30', ilhan: 'İZİNLİ', nilufer: '08.30-17.30', huseyin: '13.30-20.30', recep: '13.30-20.30 (ÇAKABEY)' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '13.30-20.30', recep: '08.30-17.30 (OFİS)' },
+                { dilek: 'İZİNLİ', ilhan: '13.30-20.30', nilufer: 'İZİNLİ', huseyin: 'İZİNLİ', recep: '10.00-19.00 (KİLİSE)' },
+                { dilek: 'İZİNLİ', ilhan: '13.30-20.30', nilufer: 'İZİNLİ', huseyin: 'İZİNLİ', recep: '10.00-19.00 (KİLİSE)' }
+            ]},
+            { name: "2. Hafta", days: [
+                { dilek: 'İZİNLİ', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '10.00-19.00', recep: '08.30-17.30 (ÇAKABEY)' },
+                { dilek: 'İZİNLİ', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '10.00-19.00', recep: '08.30-17.30 (ÇAKABEY)' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: 'İZİNLİ', huseyin: '10.00-19.00', recep: '08.30-17.30 (KİLİSE)' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: 'İZİNLİ', huseyin: '10.00-19.00', recep: '08.30-17.30 (KİLİSE)' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '10.00-19.00', recep: '08.30-17.30 (OFİS)' },
+                { dilek: '13.30-20.30', ilhan: 'İZİNLİ', nilufer: '10.00-19.00', huseyin: 'İZİNLİ', recep: 'İZİNLİ' },
+                { dilek: '13.30-20.30', ilhan: 'İZİNLİ', nilufer: '10.00-19.00', huseyin: 'İZİNLİ', recep: 'İZİNLİ' }
+            ]},
+            { name: "3. Hafta", days: [
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '10.00-19.00', recep: 'İZİNLİ' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '10.00-19.00', recep: 'İZİNLİ' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: 'İZİNLİ', recep: '10.00-19.00 (KİLİSE)' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: 'İZİNLİ', recep: '10.00-19.00 (KİLİSE)' },
+                { dilek: '08.30-17.30', ilhan: '13.30-20.30', nilufer: '08.30-17.30', huseyin: '10.00-19.00', recep: '08.30-17.30 (OFİS)' },
+                { dilek: 'İZİNLİ', ilhan: 'İZİNLİ', nilufer: 'İZİNLİ', huseyin: '10.00-19.00', recep: '13.30-20.30 (ÇAKABEY)' },
+                { dilek: 'İZİNLİ', ilhan: 'İZİNLİ', nilufer: 'İZİNLİ', huseyin: '10.00-19.00', recep: '13.30-20.30 (ÇAKABEY)' }
+            ]}
+        ];
+        units = [{name:'ÇAKABEY-KİLİSE', cycle:3}, {name:'OFİS', cycle:1}];
+    }
+    populatePersonFilter();
+    populateUnitFilter();
+}
+
+async function saveData() {
+    const data = { persons, schedule: scheduleData, units };
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    } catch(e) {
+        alert('Kaydetme hatası: ' + e.message);
+    }
+}
+
+function showSpinner() {
+    document.getElementById('saveSpinner').classList.add('active');
+}
+function hideSpinner() {
+    document.getElementById('saveSpinner').classList.remove('active');
+}
+
+function populatePersonFilter() {
+    personFilter.innerHTML = '<option value="all">Tüm Kişiler</option>';
+    Object.keys(persons).forEach(key => {
+        personFilter.innerHTML += `<option value="${key}">${persons[key].name}</option>`;
+    });
+}
+
+function populateUnitFilter() {
+    unitFilter.innerHTML = '<option value="all">Tüm Birimler</option>';
+    units.forEach(unit => {
+        unitFilter.innerHTML += `<option value="${unit.name}">${unit.name}</option>`;
+    });
+}
+
+function init() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    datePicker.value = formatDateForInput(today);
+
+    // Restore last selected unit from localStorage
+    const savedUnit = localStorage.getItem('vardiya_unit') || 'ÇAKABEY-KİLİSE';
+    unitFilter.value = savedUnit;
+
+    datePicker.addEventListener('change', renderSchedule);
+    viewMode.addEventListener('change', renderSchedule);
+    unitFilter.addEventListener('change', () => {
+        localStorage.setItem('vardiya_unit', unitFilter.value);
+        renderSchedule();
+    });
+    personFilter.addEventListener('change', renderSchedule);
+
+    loadData().then(renderSchedule);
+}
+
+function goToToday() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    datePicker.value = formatDateForInput(today);
+    renderSchedule();
+}
+
+function calculateWeekIndex(targetDate, unitName) {
+    const d = new Date(targetDate);
+    const day = d.getDay();
+    const diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+    const targetMonday = new Date(d.setDate(diffToMonday));
+    targetMonday.setHours(0,0,0,0);
+
+    const diffTime = targetMonday.getTime() - ANCHOR_DATE.getTime();
+    const diffDays = Math.round(diffTime / (1000*60*60*24));
+    let diffWeeks = Math.floor(diffDays / 7);
+
+    let cycle = 3;
+    if (unitName && unitName !== 'all') {
+        const unitObj = units.find(u => u.name === unitName);
+        if (unitObj) cycle = unitObj.cycle || 3;
+    }
+
+    let weekIndex = diffWeeks % cycle;
+    if (weekIndex < 0) weekIndex += cycle;
+    return weekIndex;
+}
+
+function renderHeaderButtons() {
+    const headerButtons = document.getElementById('headerButtons');
+    if (isAdmin) {
+        headerButtons.innerHTML = `<button class="admin-btn" onclick="openAdminModal()">⚙️ Yönetici</button>`;
+    } else {
+        headerButtons.innerHTML = `<button class="admin-btn" onclick="openLoginModal()">Yönetici</button>`;
+    }
+}
+
+function renderSchedule() {
+    renderHeaderButtons();
+    const selectedDateStr = datePicker.value;
+    if (!selectedDateStr) return;
+
+    const selectedDate = new Date(selectedDateStr);
+    selectedDate.setHours(0,0,0,0);
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const filterVal = personFilter.value;
+    const mode = viewMode.value;
+    const unitVal = unitFilter.value;
+    const personKeys = Object.keys(persons);
+
+    // Header
+    let headerHTML = '<tr><th>TARİH/GÜN</th>';
+    personKeys.forEach(key => {
+        const personUnit = persons[key].unit || '';
+        const showByPerson = filterVal === 'all' || filterVal === key;
+        const showByUnit = unitVal === 'all' || personUnit === unitVal;
+        const show = showByPerson && showByUnit;
+        headerHTML += `<th data-person="${key}" style="display:${show?'table-cell':'none'}">${persons[key].name.toUpperCase()}</th>`;
+    });
+    headerHTML += '</tr>';
+    tableHead.innerHTML = headerHTML;
+
+    tableBody.innerHTML = '';
+    let bugunIzinliler = [];
+    let yarinIzinliler = [];
+    let weeksToRender = [];
+
+    const dayOfWeek = selectedDate.getDay();
+    const mondayOffset = selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    let cycleStart = new Date(selectedDate);
+    cycleStart.setDate(mondayOffset);
+    cycleStart.setHours(0,0,0,0);
+
+    if (mode === 'week') {
+        weeksToRender.push(new Date(cycleStart));
+    } else {
+        for (let w = 0; w < 4; w++) {
+            weeksToRender.push(new Date(cycleStart));
+            cycleStart.setDate(cycleStart.getDate() + 7);
+        }
+    }
+
+    const visibleColsCount = (filterVal === 'all' ? personKeys.length : 1) + 1;
+
+    weeksToRender.forEach((weekStart, idx) => {
+        const weekIndex = calculateWeekIndex(weekStart, unitVal);
+        const currentWeekData = scheduleData[weekIndex]?.days || [];
+
+        if (mode === 'month') {
+            const endOfWeek = new Date(weekStart);
+            endOfWeek.setDate(weekStart.getDate() + 6);
+            const startStr = `${weekStart.getDate()} ${monthNames[weekStart.getMonth()]}`;
+            const endStr = `${endOfWeek.getDate()} ${monthNames[endOfWeek.getMonth()]}`;
+
+            let trSep = document.createElement('tr');
+            trSep.innerHTML = `<td colspan="${visibleColsCount}" class="week-separator">📅 ${startStr} - ${endStr}</td>`;
+            tableBody.appendChild(trSep);
+
+            if (idx > 0) {
+                let trSub = document.createElement('tr');
+                trSub.className = 'sub-header';
+                let subHtml = '<th>TARİH/GÜN</th>';
+                personKeys.forEach(key => {
+                    const personUnit = persons[key].unit || '';
+                    const showByPerson = filterVal === 'all' || filterVal === key;
+                    const showByUnit = unitVal === 'all' || personUnit === unitVal;
+                    const displayStyle = (showByPerson && showByUnit) ? 'table-cell' : 'none';
+                    subHtml += `<th data-person="${key}" style="display:${displayStyle}">${persons[key].name.toUpperCase()}</th>`;
+                });
+                trSub.innerHTML = subHtml;
+                tableBody.appendChild(trSub);
+            }
+        }
+
+        for (let i = 0; i < 7; i++) {
+            const rowDate = new Date(weekStart);
+            rowDate.setDate(weekStart.getDate() + i);
+
+            const isToday = rowDate.getTime() === today.getTime();
+            const isTomorrow = rowDate.getTime() === tomorrow.getTime();
+            const shiftData = currentWeekData[i] || {};
+
+            let trClass = '';
+            let dateBadge = '';
+
+            if (isToday) {
+                trClass = 'row-today';
+                dateBadge = '<div class="badge badge-today">BUGÜN</div>';
+            } else if (isTomorrow) {
+                trClass = 'row-tomorrow';
+                dateBadge = '<div class="badge badge-tomorrow">YARIN</div>';
+            }
+
+            const dayName = dayNames[rowDate.getDay()];
+            const formattedDateStr = `${rowDate.getDate().toString().padStart(2,'0')}.${(rowDate.getMonth()+1).toString().padStart(2,'0')}.${rowDate.getFullYear()}`;
+
+            let tr = document.createElement('tr');
+            if (trClass) tr.className = trClass;
+
+            let html = `<td><strong>${formattedDateStr}</strong><br>${dayName} ${dateBadge}</td>`;
+
+            personKeys.forEach(key => {
+                const personUnit = persons[key].unit || '';
+                const showByPerson = filterVal === 'all' || filterVal === key;
+                const showByUnit = unitVal === 'all' || personUnit === unitVal;
+                const shift = shiftData[key] || '-';
+                const isIzinli = shift.includes('İZİNLİ');
+
+                if (!showByPerson || !showByUnit) {
+                    html += `<td data-person="${key}" style="display:none"></td>`;
+                    return;
+                }
+
+                const cellClass = isIzinli ? 'izinli-cell' : '';
+
+                const dblClickHandler = isAdmin ? `ondblclick="openEditModal('${weekIndex}','${i}','${key}')"` : '';
+                html += `<td data-person="${key}" class="${cellClass}" ${dblClickHandler}><span class="edit-cell${isAdmin ? ' tap-hint' : ''}">${shift}</span></td>`;
+
+                if (idx === 0) {
+                    if (isIzinli) {
+                        if (isToday && !bugunIzinliler.includes(persons[key].shortName)) bugunIzinliler.push(persons[key].shortName);
+                        if (isTomorrow && !yarinIzinliler.includes(persons[key].shortName)) yarinIzinliler.push(persons[key].shortName);
+                    }
+                }
+            });
+
+            tr.innerHTML = html;
+            tableBody.appendChild(tr);
+        }
+    });
+
+    // Info panel
+    let infoHtml = `<strong>Birim:</strong> ${unitVal === 'all' ? 'Tüm Birimler' : unitVal}<br>`;
+    const wIndex = calculateWeekIndex(selectedDate, unitVal);
+    infoHtml += mode === 'week'
+        ? `<strong>Görüntülenen:</strong> ${wIndex + 1}. Hafta<br>`
+        : `<strong>Görüntülenen:</strong> 4 Haftalık Döngü<br>`;
+
+    if (bugunIzinliler.length > 0) {
+        infoHtml += `<div style="margin-top:5px">🟢 <strong>Bugün İzinli:</strong> <span class="izinli-text">${bugunIzinliler.join(', ')}</span></div>`;
+    } else {
+        infoHtml += `<div style="margin-top:5px">🟢 <strong>Bugün İzinli:</strong> Yok</div>`;
+    }
+
+    if (yarinIzinliler.length > 0) {
+        infoHtml += `<div style="margin-top:4px">🟡 <strong>Yarın İzinli:</strong> <span class="izinli-text">${yarinIzinliler.join(', ')}</span></div>`;
+    }
+
+    if (isAdmin) {
+        infoHtml += `<div style="margin-top:8px;color:#0d6efd;font-size:13px">✏️ Düzenlemek için hücreye çift tıklayın</div>`;
+    }
+
+    infoPanel.innerHTML = infoHtml;
+}
+
+// Login Modal
+function openLoginModal() {
+    document.getElementById('loginModal').classList.add('active');
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginError').style.display = 'none';
+    document.getElementById('loginUser').focus();
+}
+
+function closeLoginModal() {
+    document.getElementById('loginModal').classList.remove('active');
+}
+
+function doLogin() {
+    const user = document.getElementById('loginUser').value;
+    const pass = document.getElementById('loginPass').value;
+    if (user === 'admin' && pass === 'admin123') {
+        isAdmin = true;
+        localStorage.setItem('vardiya_admin', 'true');
+        closeLoginModal();
+        openAdminModal();
+        renderSchedule();
+    } else {
+        document.getElementById('loginError').style.display = 'block';
+    }
+}
+
+// Admin Modal
+function openAdminModal() {
+    document.getElementById('adminModal').classList.add('active');
+}
+
+function closeAdminModal() {
+    document.getElementById('adminModal').classList.remove('active');
+}
+
+function logoutAdmin() {
+    isAdmin = false;
+    localStorage.removeItem('vardiya_admin');
+    closeAdminModal();
+    renderSchedule();
+}
+
+function downloadBackup() {
+    const data = { persons, schedule: scheduleData, units };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}${(now.getMonth()+1).toString().padStart(2,'0')}${now.getDate().toString().padStart(2,'0')}_${now.getHours().toString().padStart(2,'0')}${now.getMinutes().toString().padStart(2,'0')}`;
+    a.download = `vardiya_yedek_${dateStr}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function restoreBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (data.persons && data.schedule) {
+                persons = data.persons;
+                scheduleData = data.schedule;
+                if (data.units) units = data.units?.map(u => typeof u === 'string' ? {name: u, cycle: 3} : u) || units;
+                populatePersonFilter();
+                populateUnitFilter();
+                showSpinner();
+                saveData().then(() => {
+                    hideSpinner();
+                    renderSchedule();
+                    alert('Yedek başarıyla yüklendi!');
+                });
+            } else {
+                alert('Geçersiz yedek dosyası!');
+            }
+        } catch(err) {
+            alert('Dosya okunamadı: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+// Edit Modal
+function openEditModal(week, day, person) {
+    if (!isAdmin) return;
+
+    document.getElementById('editWeek').value = week;
+    document.getElementById('editDay').value = day;
+    document.getElementById('editPerson').value = persons[person].name;
+    document.getElementById('editDate').value = `${weekIndexToDate(week, day)}`;
+
+    const currentShift = scheduleData[week]?.days[day]?.[person] || '';
+    const shiftSelect = document.getElementById('editShift');
+    const opts = shiftSelect.options;
+    let found = false;
+    for (let i = 0; i < opts.length; i++) {
+        if (opts[i].value === currentShift) {
+            shiftSelect.selectedIndex = i;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        shiftSelect.selectedIndex = 0;
+    }
+
+    document.getElementById('editModal').classList.add('active');
+}
+
+function weekIndexToDate(weekIndex, dayIndex) {
+    const totalDays = weekIndex * 7 + dayIndex;
+    const d = new Date(ANCHOR_DATE);
+    d.setDate(d.getDate() + totalDays);
+    return `${d.getDate()}.${(d.getMonth()+1).toString().padStart(2,'0')}.${d.getFullYear()} ${dayNames[d.getDay()]}`;
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+}
+
+async function saveEdit() {
+    const week = parseInt(document.getElementById('editWeek').value);
+    const day = parseInt(document.getElementById('editDay').value);
+    const shift = document.getElementById('editShift').value;
+
+    if (!scheduleData[week]) scheduleData[week] = { name: `${week + 1}. Hafta`, days: [] };
+    if (!scheduleData[week].days[day]) {
+        const personKeys = Object.keys(persons);
+        scheduleData[week].days[day] = {};
+        personKeys.forEach(k => scheduleData[week].days[day][k] = '-');
+    }
+
+    const personFilter = document.getElementById('personFilter');
+    const allPersons = Object.keys(persons);
+    for (const p of allPersons) {
+        if (!scheduleData[week].days[day][p]) {
+            scheduleData[week].days[day][p] = '-';
+        }
+    }
+
+    const selectedPerson = allPersons.find(k => persons[k].name === document.getElementById('editPerson').value);
+    if (selectedPerson) {
+        scheduleData[week].days[day][selectedPerson] = shift;
+    }
+
+    showSpinner();
+    await saveData();
+    hideSpinner();
+    closeEditModal();
+    renderSchedule();
+}
+
+function formatDateForInput(dateObj) {
+    const y = dateObj.getFullYear();
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        closeLoginModal();
+        closeEditModal();
+        closeAdminModal();
+        closePersonsModal();
+        closeEditPersonModal();
+        closeUnitsModal();
+        closeEditUnitModal();
+    }
+    if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('active')) {
+        doLogin();
+    }
+});
+
+// Persons Management
+function populateUnitDropdowns() {
+    const selects = ['newPersonUnit', 'editPersonUnit'];
+    selects.forEach(id => {
+        const select = document.getElementById(id);
+        if (!select) return;
+        select.innerHTML = '<option value="">Birim Seçin...</option>';
+        units.forEach(unit => {
+            select.innerHTML += `<option value="${unit}">${unit}</option>`;
+        });
+    });
+}
+
+function openPersonsModal() {
+    closeAdminModal();
+    populateUnitDropdowns();
+    renderPersonsList();
+    document.getElementById('personsModal').classList.add('active');
+}
+
+function closePersonsModal() {
+    document.getElementById('personsModal').classList.remove('active');
+    document.getElementById('newPersonName').value = '';
+    document.getElementById('newPersonShort').value = '';
+    document.getElementById('newPersonUnit').value = '';
+}
+
+function renderPersonsList() {
+    const list = document.getElementById('personsList');
+    let html = '<div style="display:flex;flex-direction:column;gap:8px">';
+    Object.keys(persons).forEach(key => {
+        const p = persons[key];
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8f9fa;border-radius:6px">
+            <div>
+                <div style="font-weight:600">${p.name}</div>
+                <div style="font-size:12px;color:#666">Kısa: ${p.shortName} | Birim: ${p.unit || '-'}</div>
+            </div>
+            <button onclick="openEditPersonModal('${key}')" style="background:#0d6efd;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Düzenle</button>
+        </div>`;
+    });
+    html += '</div>';
+    list.innerHTML = html;
+}
+
+function openEditPersonModal(key) {
+    closePersonsModal();
+    populateUnitDropdowns();
+    document.getElementById('editPersonKey').value = key;
+    document.getElementById('editPersonName').value = persons[key].name;
+    document.getElementById('editPersonShort').value = persons[key].shortName;
+    document.getElementById('editPersonUnit').value = persons[key].unit || '';
+    document.getElementById('editPersonModal').classList.add('active');
+}
+
+function closeEditPersonModal() {
+    document.getElementById('editPersonModal').classList.remove('active');
+}
+
+function savePersonEdit() {
+    const key = document.getElementById('editPersonKey').value;
+    const name = document.getElementById('editPersonName').value.trim();
+    const shortName = document.getElementById('editPersonShort').value.trim();
+    const unit = document.getElementById('editPersonUnit').value.trim();
+
+    if (!name || !shortName) {
+        alert('Ad Soyad ve Kısa Ad zorunludur!');
+        return;
+    }
+
+    // Update person data, preserving schedule data
+    persons[key] = { name, shortName, unit: unit || undefined };
+    showSpinner();
+    saveData().then(() => {
+        hideSpinner();
+        populatePersonFilter();
+        renderSchedule();
+        closeEditPersonModal();
+    });
+}
+
+function deletePerson() {
+    const key = document.getElementById('editPersonKey').value;
+    if (!confirm(`"${persons[key].name}" kişisini silmek istediğinize emin misiniz?\n\nNot: Bu kişinin vardiya kayıtları kalacaktır.`)) return;
+
+    // Remove from persons
+    delete persons[key];
+
+    // Remove from all schedule data
+    scheduleData.forEach(week => {
+        week.days.forEach(day => {
+            delete day[key];
+        });
+    });
+
+    showSpinner();
+    saveData().then(() => {
+        hideSpinner();
+        populatePersonFilter();
+        renderSchedule();
+        closeEditPersonModal();
+        alert('Kişi silindi!');
+    });
+}
+
+function addNewPerson() {
+    const name = document.getElementById('newPersonName').value.trim();
+    const shortName = document.getElementById('newPersonShort').value.trim();
+    const unit = document.getElementById('newPersonUnit').value.trim();
+
+    if (!name || !shortName) {
+        alert('Ad Soyad ve Kısa Ad zorunludur!');
+        return;
+    }
+
+    // Generate unique key from shortName
+    let key = shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    let originalKey = key;
+    let counter = 1;
+    while (persons[key]) {
+        key = originalKey + counter;
+        counter++;
+    }
+
+    persons[key] = { name, shortName, unit: unit || undefined };
+
+    // Initialize new person in all existing schedule days with '-'
+    scheduleData.forEach(week => {
+        week.days.forEach(day => {
+            if (!day[key]) day[key] = '-';
+        });
+    });
+
+    showSpinner();
+    saveData().then(() => {
+        hideSpinner();
+        populatePersonFilter();
+        renderSchedule();
+        closePersonsModal();
+        alert(`${name} kişisi eklendi!`);
+    });
+}
+
+// Units Management
+function openUnitsModal() {
+    closeAdminModal();
+    renderUnitsList();
+    document.getElementById('unitsModal').classList.add('active');
+}
+
+function closeUnitsModal() {
+    document.getElementById('unitsModal').classList.remove('active');
+    document.getElementById('newUnitName').value = '';
+}
+
+function closeEditUnitModal() {
+    document.getElementById('editUnitModal').classList.remove('active');
+}
+
+function renderUnitsList() {
+    const list = document.getElementById('unitsList');
+    let html = '<div style="display:flex;flex-direction:column;gap:8px">';
+    units.forEach((unit, index) => {
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8f9fa;border-radius:6px">
+            <div><strong>${unit.name}</strong> <span style="color:#666;font-size:12px">(${unit.cycle} hafta döngü)</span></div>
+            <button onclick="openEditUnitModal(${index})" style="background:#0d6efd;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Düzenle</button>
+        </div>`;
+    });
+    html += '</div>';
+    list.innerHTML = html;
+}
+
+function openEditUnitModal(index) {
+    closeUnitsModal();
+    const unit = units[index];
+    document.getElementById('editUnitIndex').value = index;
+    document.getElementById('editUnitName').value = unit.name;
+    document.getElementById('editUnitCycle').value = unit.cycle;
+    document.getElementById('editUnitModal').classList.add('active');
+}
+
+function saveUnitEdit() {
+    const index = parseInt(document.getElementById('editUnitIndex').value);
+    const name = document.getElementById('editUnitName').value.trim();
+    const cycle = parseInt(document.getElementById('editUnitCycle').value) || 3;
+
+    if (!name) {
+        alert('Birim adı zorunludur!');
+        return;
+    }
+
+    units[index] = { name, cycle };
+    showSpinner();
+    saveData().then(() => {
+        hideSpinner();
+        populateUnitFilter();
+        renderSchedule();
+        closeEditUnitModal();
+    });
+}
+
+function deleteUnit() {
+    const index = parseInt(document.getElementById('editUnitIndex').value);
+    const unit = units[index];
+
+    if (units.length <= 1) {
+        alert('En az bir birim kalmalıdır!');
+        return;
+    }
+
+    if (!confirm(`"${unit.name}" birimini silmek istediğinize emin misiniz?`)) return;
+
+    units.splice(index, 1);
+    showSpinner();
+    saveData().then(() => {
+        hideSpinner();
+        populateUnitFilter();
+        renderSchedule();
+        closeEditUnitModal();
+        alert('Birim silindi!');
+    });
+}
+
+function addNewUnit() {
+    const name = document.getElementById('newUnitName').value.trim();
+
+    if (!name) {
+        alert('Birim adı zorunludur!');
+        return;
+    }
+
+    if (units.some(u => u.name === name)) {
+        alert('Bu birim zaten mevcut!');
+        return;
+    }
+
+    units.push({ name, cycle: 3 });
+    showSpinner();
+    saveData().then(() => {
+        hideSpinner();
+        populateUnitFilter();
+        renderSchedule();
+        closeUnitsModal();
+        alert(`${name} birimi eklendi!`);
+    });
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
