@@ -4,679 +4,657 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Vardiya Takvimi</title>
-<style>
-    :root {
-        --primary: #1a73e8;
-        --primary-dark: #1557b0;
-        --primary-light: #e8f0fe;
-        --success: #0f9d58;
-        --success-dark: #0b8043;
-        --danger: #d93025;
-        --danger-dark: #b3261e;
-        --warning: #f9ab00;
-        --warning-dark: #e37400;
-        --bg-color: #f0f2f5;
-        --header-bg: linear-gradient(135deg, #0a1628 0%, #1a2744 50%, #162a4a 100%);
-        --table-border: #e2e5ea;
-        --izinli-bg: linear-gradient(135deg, #d93025, #b3261e);
-        --today-bg: #e6f4ea;
-        --today-border: #0f9d58;
-        --tomorrow-bg: #fef7e0;
-        --tomorrow-border: #f9ab00;
-        --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
-        --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
-        --gold: #d4af37;
-        --gold-light: #f5e7a3;
-        --text-primary: #1f2937;
-        --text-secondary: #6b7280;
-        --radius: 12px;
-        --radius-sm: 8px;
-        --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-glow: rgba(59,130,246,0.25);
+            --success: #10b981;
+            --success-dark: #059669;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --warning: #f59e0b;
+            --warning-dark: #d97706;
 
-    * { box-sizing: border-box; }
+            --bg: #0b0f1a;
+            --bg-2: #111827;
+            --bg-3: #1a2235;
+            --surface: rgba(255,255,255,0.04);
+            --surface-hover: rgba(255,255,255,0.07);
+            --border: rgba(255,255,255,0.08);
+            --border-strong: rgba(255,255,255,0.14);
 
-    body {
-        font-family: var(--font-sans);
-        background: var(--bg-color);
-        margin: 0;
-        padding: 16px;
-        color: var(--text-primary);
-        -webkit-tap-highlight-color: transparent;
-        min-height: 100vh;
-        background-image: radial-gradient(ellipse at 10% 20%, rgba(26,115,232,0.03) 0%, transparent 50%),
-                          radial-gradient(ellipse at 90% 80%, rgba(15,157,88,0.03) 0%, transparent 50%);
-    }
+            --text: #f0f4ff;
+            --text-2: #94a3b8;
+            --text-3: #64748b;
 
-    .container {
-        max-width: 1100px;
-        margin: 0 auto;
-        background: #fff;
-        border-radius: var(--radius);
-        box-shadow: var(--card-shadow);
-        overflow: hidden;
-        transition: box-shadow 0.3s ease;
-        border: 1px solid rgba(226, 229, 234, 0.5);
-    }
+            --header-accent: #3b82f6;
+            --izinli-bg: rgba(239,68,68,0.18);
+            --izinli-border: rgba(239,68,68,0.4);
+            --today-bg: rgba(16,185,129,0.1);
+            --today-border: rgba(16,185,129,0.5);
+            --tomorrow-bg: rgba(245,158,11,0.08);
+            --tomorrow-border: rgba(245,158,11,0.4);
 
-    .container:hover {
-        box-shadow: var(--card-shadow-hover);
-    }
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
+        }
 
-    .header {
-        background: var(--header-bg);
-        padding: 20px 24px;
-        text-align: center;
-        position: relative;
-        border-bottom: 3px solid var(--gold);
-        overflow: hidden;
-    }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .header::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle at 30% 50%, rgba(212, 175, 55, 0.06) 0%, transparent 60%);
-        pointer-events: none;
-    }
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+            background-image:
+                radial-gradient(ellipse 80% 60% at 50% -20%, rgba(59,130,246,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 85% 80%, rgba(16,185,129,0.06) 0%, transparent 50%);
+        }
 
-    .header::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent);
-    }
+        /* ── Container ── */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
 
-    .header h1 {
-        margin: 0;
-        font-size: 22px;
-        font-weight: 700;
-        color: #fff;
-        letter-spacing: 1px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        position: relative;
-    }
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 1px solid var(--border-strong);
+            border-bottom: none;
+            border-radius: var(--radius) var(--radius) 0 0;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .header h1 span {
-        color: var(--gold);
-    }
+        .header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(59,130,246,0.07) 0%, transparent 60%);
+            pointer-events: none;
+        }
 
-    .admin-btn {
-        position: absolute;
-        right: 20px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.15);
-        padding: 8px 16px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 500;
-        color: #fff;
-        backdrop-filter: blur(8px);
-        transition: all 0.3s ease;
-        letter-spacing: 0.3px;
-    }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+        }
 
-    .admin-btn:hover {
-        background: rgba(255,255,255,0.2);
-        border-color: var(--gold);
-        box-shadow: 0 0 20px rgba(212,175,55,0.15);
-    }
+        .header-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.4);
+            flex-shrink: 0;
+        }
 
-    .controls {
-        padding: 20px 24px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        background: #fafbfc;
-        border-bottom: 1px solid var(--table-border);
-    }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text);
+        }
 
-    .control-row {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
+        .header-subtitle {
+            font-size: 12px;
+            color: var(--text-3);
+            font-weight: 400;
+            margin-top: 1px;
+            letter-spacing: 0.3px;
+        }
 
-    .control-row label {
-        min-width: 65px;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--text-secondary);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    select, input[type="date"], input[type="password"], input[type="text"] {
-        flex: 1;
-        padding: 10px 14px;
-        border: 1.5px solid #e2e5ea;
-        border-radius: var(--radius-sm);
-        font-size: 14px;
-        font-family: var(--font-sans);
-        color: var(--text-primary);
-        background: #fff;
-        transition: all 0.25s ease;
-        outline: none;
-    }
-
-    select:focus, input[type="date"]:focus, input[type="password"]:focus, input[type="text"]:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(26,115,232,0.12);
-    }
-
-    select:hover, input[type="date"]:hover, input[type="password"]:hover, input[type="text"]:hover {
-        border-color: #c4c9d1;
-    }
-
-    button {
-        padding: 10px 22px;
-        border: none;
-        border-radius: var(--radius-sm);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        font-family: var(--font-sans);
-        letter-spacing: 0.3px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    button:active { transform: scale(0.97); }
-
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-        color: white;
-        box-shadow: 0 2px 8px rgba(26,115,232,0.25);
-    }
-    .btn-primary:hover {
-        box-shadow: 0 4px 16px rgba(26,115,232,0.35);
-        transform: translateY(-1px);
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, var(--success), var(--success-dark));
-        color: white;
-        box-shadow: 0 2px 8px rgba(15,157,88,0.25);
-    }
-    .btn-success:hover {
-        box-shadow: 0 4px 16px rgba(15,157,88,0.35);
-        transform: translateY(-1px);
-    }
-
-    .btn-danger {
-        background: linear-gradient(135deg, var(--danger), var(--danger-dark));
-        color: white;
-        box-shadow: 0 2px 8px rgba(217,48,37,0.25);
-    }
-    .btn-danger:hover {
-        box-shadow: 0 4px 16px rgba(217,48,37,0.35);
-        transform: translateY(-1px);
-    }
-
-    .btn-warning {
-        background: linear-gradient(135deg, var(--warning), var(--warning-dark));
-        color: white;
-        box-shadow: 0 2px 8px rgba(249,171,0,0.25);
-    }
-    .btn-warning:hover {
-        box-shadow: 0 4px 16px rgba(249,171,0,0.35);
-        transform: translateY(-1px);
-    }
-
-    .btn-outline {
-        background: transparent;
-        color: var(--primary);
-        border: 1.5px solid var(--primary);
-    }
-    .btn-outline:hover {
-        background: var(--primary-light);
-    }
-
-    .info-panel {
-        background: linear-gradient(135deg, #f8f9fb, #f0f2f5);
-        padding: 14px 20px;
-        margin: 16px 24px;
-        border-radius: var(--radius-sm);
-        font-size: 13px;
-        border-left: 4px solid var(--primary);
-        border: 1px solid #e2e5ea;
-        border-left-width: 4px;
-    }
-
-    .izinli-text {
-        color: var(--danger);
-        font-weight: 700;
-        background: rgba(217,48,37,0.08);
-        padding: 2px 8px;
-        border-radius: 4px;
-    }
-
-    .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding: 4px 20px 20px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        font-size: 13px;
-        text-align: center;
-        min-width: 650px;
-        border-radius: var(--radius-sm);
-        overflow: hidden;
-        border: 1px solid var(--table-border);
-    }
-
-    th, td {
-        padding: 12px 8px;
-        white-space: nowrap;
-        border-bottom: 1px solid var(--table-border);
-    }
-
-    th {
-        background: linear-gradient(180deg, #f8f9fb, #f0f2f5);
-        font-weight: 700;
-        font-size: 11px;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-        color: var(--text-secondary);
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        border-bottom: 2px solid #d4d7de;
-    }
-
-    td:first-child, th:first-child {
-        position: sticky;
-        left: 0;
-        z-index: 1;
-        background: #fff;
-        font-weight: 600;
-        font-size: 12px;
-        text-align: left;
-        min-width: 110px;
-        border-right: 1px solid var(--table-border);
-    }
-
-    th:first-child {
-        z-index: 3;
-        background: linear-gradient(180deg, #f8f9fb, #f0f2f5);
-    }
-
-    td:first-child strong {
-        color: var(--text-primary);
-        display: block;
-        font-size: 12px;
-    }
-
-    .week-separator {
-        background: linear-gradient(90deg, #f0f2f5, #e8ebf0) !important;
-        font-weight: 700;
-        text-align: left;
-        padding: 10px 16px !important;
-        font-size: 12px;
-        color: var(--text-secondary);
-        letter-spacing: 0.5px;
-        border-bottom: 1px solid #d4d7de;
-    }
-
-    .izinli-cell {
-        background: var(--izinli-bg) !important;
-        color: white;
-        font-weight: 700;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        border-radius: 0 !important;
-    }
-
-    .row-today {
-        background: var(--today-bg);
-        transition: background 0.3s ease;
-    }
-    .row-today td:first-child {
-        background: var(--today-bg);
-        border-left: 4px solid var(--today-border);
-        box-shadow: inset 2px 0 8px rgba(15,157,88,0.1);
-    }
-    .row-tomorrow {
-        background: var(--tomorrow-bg);
-        transition: background 0.3s ease;
-    }
-    .row-tomorrow td:first-child {
-        background: var(--tomorrow-bg);
-        border-left: 4px solid var(--tomorrow-border);
-        box-shadow: inset 2px 0 8px rgba(249,171,0,0.1);
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 9px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        text-transform: uppercase;
-    }
-
-    .badge-today {
-        background: var(--today-border);
-        color: white;
-        box-shadow: 0 2px 6px rgba(15,157,88,0.3);
-    }
-    .badge-tomorrow {
-        background: var(--tomorrow-border);
-        color: white;
-        box-shadow: 0 2px 6px rgba(249,171,0,0.3);
-    }
-
-    /* Modal */
-    .modal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 100;
-        justify-content: center;
-        align-items: flex-start;
-        padding-top: 20px;
-        overflow-y: auto;
-        backdrop-filter: blur(4px);
-        animation: fadeIn 0.2s ease;
-    }
-
-    .modal.active { display: flex; }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @keyframes slideUp {
-        from { transform: translateY(20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* Spinner */
-    #saveSpinner {
-        display: none;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.5);
-        z-index: 200;
-        justify-content: center;
-        align-items: center;
-        backdrop-filter: blur(4px);
-    }
-    #saveSpinner.active { display: flex; }
-    .spinner-box {
-        background: white;
-        border-radius: 16px;
-        padding: 36px 48px;
-        text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-        animation: slideUp 0.3s ease;
-    }
-    .spinner-ring {
-        width: 44px;
-        height: 44px;
-        border: 4px solid #e8eaed;
-        border-top-color: var(--primary);
-        border-radius: 50%;
-        animation: spin 0.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner-text {
-        font-size: 15px;
-        color: var(--text-primary);
-        font-weight: 600;
-    }
-
-    .modal-content {
-        background: white;
-        border-radius: 16px;
-        width: 95%;
-        max-width: 460px;
-        margin: 10px auto;
-        padding: 28px;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-        animation: slideUp 0.25s ease;
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid var(--table-border);
-    }
-
-    .modal-header h2 {
-        margin: 0;
-        font-size: 18px;
-        font-weight: 700;
-        color: var(--text-primary);
-    }
-
-    .close-btn {
-        background: none;
-        border: none;
-        font-size: 22px;
-        cursor: pointer;
-        padding: 4px 8px;
-        color: var(--text-secondary);
-        border-radius: 6px;
-        transition: all 0.2s ease;
-        line-height: 1;
-    }
-
-    .close-btn:hover {
-        background: #f0f2f5;
-        color: var(--text-primary);
-    }
-
-    .form-group {
-        margin-bottom: 18px;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 600;
-        font-size: 13px;
-        color: var(--text-secondary);
-    }
-
-    .form-group input, .form-group select {
-        width: 100%;
-    }
-
-    .edit-cell {
-        cursor: pointer;
-        padding: 6px 10px;
-        border-radius: 6px;
-        transition: all 0.2s ease;
-        display: inline-block;
-        font-weight: 500;
-    }
-
-    .edit-cell:hover {
-        background: #e8f0fe;
-        color: var(--primary);
-    }
-    .edit-cell:active {
-        background: #d2e3fc;
-        transform: scale(0.96);
-    }
-    .edit-cell.editing {
-        background: #fef7e0;
-        outline: 2px solid var(--warning);
-        outline-offset: 1px;
-    }
-
-    @media (hover: none) {
-        .edit-cell:hover { background: inherit; color: inherit; }
-    }
-
-    .footer {
-        text-align: center;
-        padding: 18px 24px;
-        color: var(--text-secondary);
-        font-size: 12px;
-        border-top: 1px solid var(--table-border);
-        background: #fafbfc;
-        letter-spacing: 0.3px;
-    }
-
-    .toggle-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid var(--table-border);
-    }
-
-    /* Premium Scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f3f4; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb {
-        background: #c4c9d1;
-        border-radius: 4px;
-        border: 2px solid #f1f3f4;
-    }
-    ::-webkit-scrollbar-thumb:hover { background: #a8adb8; }
-
-    /* Info panel emoji icons */
-    .info-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        margin-right: 6px;
-        font-size: 12px;
-    }
-
-    /* Responsive - Tablet & Mobile */
-    @media (max-width: 768px) {
-        body { padding: 10px; }
-        .header { padding: 16px 18px; }
-        .header h1 { font-size: 18px; }
-        .controls { padding: 14px 16px; gap: 10px; }
-        .info-panel { margin: 12px 16px; }
-        .table-wrapper { padding: 4px 12px 16px; }
+        #headerButtons {
+            position: relative;
+        }
 
         .admin-btn {
-            padding: 6px 12px;
-            font-size: 12px;
-            right: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border-strong);
+            color: var(--text-2);
+            padding: 9px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.2px;
         }
-    }
 
-    @media (max-width: 600px) {
-        body { padding: 6px; }
-        .header h1 { font-size: 16px; letter-spacing: 0.5px; }
-        .admin-btn { padding: 6px 10px; font-size: 11px; right: 10px; }
-        .controls { padding: 12px 12px; gap: 8px; }
-        .control-row { flex-wrap: wrap; }
-        .control-row label {
-            width: 100%;
-            margin-bottom: 2px;
+        .admin-btn:hover {
+            background: var(--surface-hover);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* ── Controls ── */
+        .controls {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            padding: 16px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
             font-size: 11px;
+            font-weight: 600;
+            color: var(--text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
-        select, input[type="date"] {
-            font-size: 15px;
-            min-height: 44px;
-            padding: 10px 12px;
-        }
-        th, td { padding: 10px 5px; font-size: 11px; }
-        th { font-size: 10px; }
-        td:first-child, th:first-child { min-width: 90px; }
-        .table-wrapper { padding: 4px 8px 12px; }
-        .info-panel { margin: 10px 12px; padding: 12px 14px; font-size: 12px; }
 
+        .control-inner {
+            display: flex;
+            gap: 8px;
+        }
+
+        select, input[type="date"], input[type="password"], input[type="text"] {
+            flex: 1;
+            padding: 10px 13px;
+            background: var(--bg-3);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 34px;
+            cursor: pointer;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        select option {
+            background: var(--bg-2);
+            color: var(--text);
+        }
+
+        /* ── Buttons ── */
+        button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 2px 12px rgba(59,130,246,0.35);
+        }
+        .btn-primary:hover { box-shadow: 0 4px 20px rgba(59,130,246,0.5); transform: translateY(-1px); }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            color: white;
+            box-shadow: 0 2px 12px rgba(16,185,129,0.3);
+        }
+        .btn-success:hover { box-shadow: 0 4px 20px rgba(16,185,129,0.45); transform: translateY(-1px); }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+            color: white;
+            box-shadow: 0 2px 12px rgba(239,68,68,0.3);
+        }
+        .btn-danger:hover { box-shadow: 0 4px 20px rgba(239,68,68,0.45); transform: translateY(-1px); }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+            color: #0b0f1a;
+            box-shadow: 0 2px 12px rgba(245,158,11,0.3);
+        }
+        .btn-warning:hover { box-shadow: 0 4px 20px rgba(245,158,11,0.45); transform: translateY(-1px); }
+
+        button:active { transform: scale(0.97) !important; }
+
+        /* ── Info Panel ── */
+        .info-panel {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            padding: 14px 20px;
+            font-size: 13px;
+            color: var(--text-2);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 20px;
+            align-items: center;
+            line-height: 1.5;
+        }
+
+        .info-panel strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .izinli-text { color: #f87171; font-weight: 600; }
+
+        /* ── Table ── */
+        .table-wrapper {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: 0 0 var(--radius) var(--radius);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: center;
+            min-width: 600px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 11px 8px;
+            white-space: nowrap;
+        }
+
+        thead th {
+            background: #0d1520;
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            border-bottom: 2px solid var(--border-strong);
+        }
+
+        thead th:first-child {
+            z-index: 3;
+            background: #0d1520;
+        }
+
+        td:first-child, th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background: var(--bg-2);
+            font-family: 'DM Mono', monospace;
+            font-size: 12px;
+            text-align: left;
+            padding-left: 16px;
+            min-width: 130px;
+            border-right: 2px solid var(--border-strong);
+        }
+
+        tbody tr:hover td {
+            background: var(--surface-hover);
+        }
+        tbody tr:hover td:first-child {
+            background: var(--surface-hover);
+        }
+
+        /* Week separator */
+        .week-separator {
+            background: linear-gradient(90deg, rgba(59,130,246,0.12) 0%, transparent 100%) !important;
+            color: var(--primary) !important;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-top: 2px solid rgba(59,130,246,0.25) !important;
+            padding-left: 16px !important;
+            text-align: left;
+        }
+
+        /* Sub-header rows */
+        .sub-header th {
+            background: #0d1520;
+            color: var(--text-2);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        /* İzinli */
+        .izinli-cell {
+            background: var(--izinli-bg) !important;
+            color: #fca5a5 !important;
+            font-weight: 600;
+            border-color: var(--izinli-border) !important;
+        }
+        tbody tr:hover .izinli-cell {
+            background: rgba(239,68,68,0.22) !important;
+        }
+
+        /* Today / Tomorrow */
+        .row-today td { background: var(--today-bg); }
+        .row-today td:first-child {
+            background: var(--today-bg);
+            border-left: 3px solid var(--success);
+        }
+        .row-tomorrow td { background: var(--tomorrow-bg); }
+        .row-tomorrow td:first-child {
+            background: var(--tomorrow-bg);
+            border-left: 3px solid var(--warning);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+            margin-left: 4px;
+        }
+        .badge-today {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+        }
+        .badge-tomorrow {
+            background: var(--warning);
+            color: #0b0f1a;
+            box-shadow: 0 2px 8px rgba(245,158,11,0.4);
+        }
+
+        /* Edit cell */
         .edit-cell {
             cursor: pointer;
-            padding: 10px 6px;
-            border-radius: 6px;
-            transition: background 0.2s;
             display: block;
-            min-height: 44px;
+            padding: 6px 4px;
+            border-radius: 6px;
+            transition: background 0.15s;
+            font-size: 12px;
             line-height: 1.4;
         }
-        .edit-cell:hover { background: #e8f0fe; }
+        .edit-cell:hover { background: var(--surface-hover); }
+        .edit-cell:active { background: rgba(245,158,11,0.2); }
         .edit-cell.editing {
-            background: #fef7e0;
+            background: rgba(245,158,11,0.15);
             outline: 2px solid var(--warning);
             outline-offset: -1px;
         }
-        .edit-cell.tap-hint::after {
-            content: ' ✏️';
-            font-size: 9px;
-            opacity: 0.4;
+
+        @media (hover: none) {
+            .edit-cell:hover { background: inherit; }
         }
 
-        .modal { padding-top: 0; align-items: stretch; }
-        .modal-content {
-            border-radius: 0;
-            width: 100%;
-            max-width: none;
-            margin: 0;
-            padding: 24px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-3);
+            font-size: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Spinner ── */
+        #saveSpinner {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            z-index: 200;
             justify-content: center;
+            align-items: center;
         }
-        .modal-content h2 { font-size: 18px; }
-        .form-group input, .form-group select {
-            min-height: 48px;
-            font-size: 15px;
-            padding: 12px;
-        }
+        #saveSpinner.active { display: flex; }
 
-        .controls button, .btn-primary, .btn-success, .btn-danger, .btn-warning {
-            min-height: 48px;
-            padding: 12px 18px;
+        .spinner-box {
+            background: var(--bg-2);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius);
+            padding: 32px 44px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+        .spinner-ring {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-strong);
+            border-top-color: var(--success);
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-text {
             font-size: 14px;
+            color: var(--text-2);
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
-        .close-btn { padding: 8px; font-size: 24px; }
-        .week-separator { font-size: 11px; padding: 8px 12px !important; }
-        .badge { font-size: 8px; padding: 2px 8px; }
-        .footer { font-size: 11px; padding: 14px 16px; }
-    }
+        /* ── Modal ── */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 16px;
+            overflow-y: auto;
+        }
+        .modal.active { display: flex; }
 
-    #personsList::-webkit-scrollbar { width: 6px; }
-    #personsList::-webkit-scrollbar-track { background: #f1f3f4; border-radius: 3px; }
-    #personsList::-webkit-scrollbar-thumb { background: #c4c9d1; border-radius: 3px; }
-    #personsList::-webkit-scrollbar-thumb:hover { background: #a8adb8; }
+        .modal-content {
+            background: var(--bg-2);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 440px;
+            margin: auto;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.22s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-    /* Print Styles */
-    @media print {
-        body { background: white; padding: 0; }
-        .controls, .info-panel, .admin-btn, .header-buttons, .footer { display: none !important; }
-        .container { box-shadow: none; border: none; }
-        table { font-size: 11px; }
-        th { background: #f5f5f5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .izinli-cell { background: #fce4ec !important; color: #c62828 !important; text-shadow: none; }
-        .row-today { background: #e8f5e9 !important; }
-        .row-tomorrow { background: #fff8e1 !important; }
-    }
-</style>
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
+
+        .close-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-3);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 6px;
+            line-height: 1;
+            transition: all 0.15s;
+        }
+        .close-btn:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+        }
+
+        .form-group input[readonly] {
+            background: rgba(255,255,255,0.03);
+            color: var(--text-2);
+            cursor: default;
+            border-color: var(--border);
+        }
+
+        /* Admin Panel buttons */
+        #adminModal .modal-content > div > button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 13px 18px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        /* Persons / Units lists inline */
+        #personsList, #unitsList {
+            max-height: 50vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-strong) transparent;
+        }
+        #personsList::-webkit-scrollbar,
+        #unitsList::-webkit-scrollbar { width: 5px; }
+        #personsList::-webkit-scrollbar-thumb,
+        #unitsList::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+        /* Toggle row */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 640px) {
+            body { padding: 8px; }
+
+            .header { padding: 14px 16px; }
+            .header h1 { font-size: 17px; }
+            .header-icon { width: 36px; height: 36px; font-size: 17px; }
+            .header-subtitle { display: none; }
+            .admin-btn { padding: 8px 12px; font-size: 12px; }
+
+            .controls {
+                padding: 12px 14px;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            select, input[type="date"] { font-size: 16px; min-height: 44px; }
+
+            th, td { padding: 9px 4px; font-size: 11px; }
+            td:first-child, th:first-child { min-width: 110px; padding-left: 10px; }
+
+            .modal { padding: 0; align-items: stretch; }
+            .modal-content {
+                border-radius: 0;
+                width: 100%;
+                max-width: none;
+                margin: 0;
+                min-height: 100dvh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .edit-cell {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .edit-cell.tap-hint::after {
+                content: ' ✏️';
+                font-size: 9px;
+                opacity: 0.4;
+            }
+
+            .btn-primary, .btn-success, .btn-danger, .btn-warning {
+                min-height: 48px;
+                padding: 13px 18px;
+            }
+
+            .close-btn { padding: 8px 12px; font-size: 20px; }
+
+            .info-panel { padding: 12px 14px; gap: 4px 14px; font-size: 12px; }
+        }
+
+        @media (max-width: 400px) {
+            .controls { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
 
@@ -689,31 +667,39 @@
 
 <div class="container">
     <div class="header">
-        <h1><span>Vardiya</span> Takvimi</h1>
+        <div class="header-left">
+            <div class="header-icon">📅</div>
+            <div>
+                <h1>Vardiya Takvimi</h1>
+                <div class="header-subtitle">Personel Çalışma Programı</div>
+            </div>
+        </div>
         <div id="headerButtons"></div>
     </div>
 
     <div class="controls">
-        <div class="control-row">
-            <label for="datePicker">Tarih:</label>
-            <input type="date" id="datePicker">
-            <button class="btn-primary" onclick="goToToday()">Bugün</button>
+        <div class="control-group">
+            <label for="datePicker">Tarih</label>
+            <div class="control-inner">
+                <input type="date" id="datePicker">
+                <button class="btn-primary" onclick="goToToday()" style="flex-shrink:0">Bugün</button>
+            </div>
         </div>
-        <div class="control-row">
-            <label for="viewMode">Görünüm:</label>
+        <div class="control-group">
+            <label for="viewMode">Görünüm</label>
             <select id="viewMode">
                 <option value="month" selected>4 Hafta</option>
                 <option value="week">Bu Hafta</option>
             </select>
         </div>
-        <div class="control-row">
-            <label for="unitFilter">Birim:</label>
+        <div class="control-group">
+            <label for="unitFilter">Birim</label>
             <select id="unitFilter">
                 <option value="all">Tüm Birimler</option>
             </select>
         </div>
-        <div class="control-row">
-            <label for="personFilter">Kişi:</label>
+        <div class="control-group">
+            <label for="personFilter">Kişi</label>
             <select id="personFilter">
                 <option value="all">Tüm Kişiler</option>
             </select>
@@ -727,28 +713,27 @@
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
         </table>
+        <div class="footer">Created by İlhan Akdeniz</div>
     </div>
-
-    <div class="footer">Created by İlhan Akdeniz</div>
 </div>
 
 <!-- Login Modal -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Yönetici Girişi</h2>
+            <h2>🔐 Yönetici Girişi</h2>
             <button class="close-btn" onclick="closeLoginModal()">&times;</button>
         </div>
         <div class="form-group">
-            <label>Kullanıcı Adı:</label>
+            <label>Kullanıcı Adı</label>
             <input type="text" id="loginUser" placeholder="admin">
         </div>
         <div class="form-group">
-            <label>Şifre:</label>
+            <label>Şifre</label>
             <input type="password" id="loginPass" placeholder="••••••">
         </div>
-        <button class="btn-primary" onclick="doLogin()" style="width:100%">Giriş Yap</button>
-        <p id="loginError" style="color:red;text-align:center;margin-top:10px;display:none">Hatalı giriş!</p>
+        <button class="btn-primary" onclick="doLogin()" style="width:100%;margin-top:4px">Giriş Yap</button>
+        <p id="loginError" style="color:#f87171;text-align:center;margin-top:12px;display:none;font-size:13px">Hatalı kullanıcı adı veya şifre!</p>
     </div>
 </div>
 
@@ -756,19 +741,19 @@
 <div class="modal" id="editModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Vardiya Düzenle</h2>
+            <h2>✏️ Vardiya Düzenle</h2>
             <button class="close-btn" onclick="closeEditModal()">&times;</button>
         </div>
         <div class="form-group">
-            <label>Tarih:</label>
-            <input type="text" id="editDate" readonly style="background:#eee">
+            <label>Tarih</label>
+            <input type="text" id="editDate" readonly>
         </div>
         <div class="form-group">
-            <label>Kişi:</label>
-            <input type="text" id="editPerson" readonly style="background:#eee">
+            <label>Kişi</label>
+            <input type="text" id="editPerson" readonly>
         </div>
         <div class="form-group">
-            <label>Vardiya:</label>
+            <label>Vardiya</label>
             <select id="editShift">
                 <option value="08.30-17.30">08.30-17.30</option>
                 <option value="13.30-20.30">13.30-20.30</option>
@@ -795,10 +780,10 @@
 <div class="modal" id="adminModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Yönetici Paneli</h2>
+            <h2>⚙️ Yönetici Paneli</h2>
             <button class="close-btn" onclick="closeAdminModal()">&times;</button>
         </div>
-        <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:10px">
             <button class="btn-success" onclick="downloadBackup()">📥 Yedek İndir</button>
             <button class="btn-warning" onclick="document.getElementById('restoreFile').click()">📤 Yedek Yükle</button>
             <input type="file" id="restoreFile" accept=".json" style="display:none" onchange="restoreBackup(event)">
@@ -813,14 +798,14 @@
 <div class="modal" id="unitsModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Birim Yönetimi</h2>
+            <h2>🏢 Birim Yönetimi</h2>
             <button class="close-btn" onclick="closeUnitsModal()">&times;</button>
         </div>
-        <div style="max-height:50vh;overflow-y:auto;margin-bottom:15px" id="unitsList"></div>
-        <div style="border-top:1px solid #eee;padding-top:15px">
-            <h3 style="margin:0 0 10px 0;font-size:16px">Yeni Birim Ekle</h3>
+        <div id="unitsList" style="margin-bottom:15px"></div>
+        <div style="border-top:1px solid var(--border);padding-top:16px">
+            <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Yeni Birim Ekle</h3>
             <div class="form-group">
-                <label>Birim Adı:</label>
+                <label>Birim Adı</label>
                 <input type="text" id="newUnitName" placeholder="Ör: ÇAKABEY-KİLİSE">
             </div>
             <button class="btn-success" onclick="addNewUnit()" style="width:100%">Birim Ekle</button>
@@ -832,17 +817,17 @@
 <div class="modal" id="editUnitModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Birim Düzenle</h2>
+            <h2>🏢 Birim Düzenle</h2>
             <button class="close-btn" onclick="closeEditUnitModal()">&times;</button>
         </div>
         <input type="hidden" id="editUnitIndex">
         <div class="form-group">
-            <label>Birim Adı:</label>
+            <label>Birim Adı</label>
             <input type="text" id="editUnitName">
         </div>
         <div class="form-group">
-            <label>Döngü (hafta):</label>
-            <select id="editUnitCycle" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px">
+            <label>Döngü (hafta)</label>
+            <select id="editUnitCycle">
                 <option value="1">1 Hafta</option>
                 <option value="2">2 Hafta</option>
                 <option value="3">3 Hafta</option>
@@ -861,23 +846,23 @@
 <div class="modal" id="personsModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Kişi Yönetimi</h2>
+            <h2>👥 Kişi Yönetimi</h2>
             <button class="close-btn" onclick="closePersonsModal()">&times;</button>
         </div>
-        <div style="max-height:60vh;overflow-y:auto;margin-bottom:15px" id="personsList"></div>
-        <div style="border-top:1px solid #eee;padding-top:15px">
-            <h3 style="margin:0 0 10px 0;font-size:16px">Yeni Kişi Ekle</h3>
+        <div id="personsList" style="margin-bottom:15px"></div>
+        <div style="border-top:1px solid var(--border);padding-top:16px">
+            <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--text-2);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Yeni Kişi Ekle</h3>
             <div class="form-group">
-                <label>Ad Soyad:</label>
+                <label>Ad Soyad</label>
                 <input type="text" id="newPersonName" placeholder="Ör: Ahmet Yılmaz">
             </div>
             <div class="form-group">
-                <label>Kısa Ad:</label>
+                <label>Kısa Ad</label>
                 <input type="text" id="newPersonShort" placeholder="Ör: Ahmet">
             </div>
             <div class="form-group">
-                <label>Birim:</label>
-                <select id="newPersonUnit" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px">
+                <label>Birim</label>
+                <select id="newPersonUnit">
                     <option value="">Birim Seçin...</option>
                 </select>
             </div>
@@ -890,21 +875,21 @@
 <div class="modal" id="editPersonModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h2>Kişi Düzenle</h2>
+            <h2>👤 Kişi Düzenle</h2>
             <button class="close-btn" onclick="closeEditPersonModal()">&times;</button>
         </div>
         <input type="hidden" id="editPersonKey">
         <div class="form-group">
-            <label>Ad Soyad:</label>
+            <label>Ad Soyad</label>
             <input type="text" id="editPersonName">
         </div>
         <div class="form-group">
-            <label>Kısa Ad:</label>
+            <label>Kısa Ad</label>
             <input type="text" id="editPersonShort">
         </div>
         <div class="form-group">
-            <label>Birim:</label>
-            <select id="editPersonUnit" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px">
+            <label>Birim</label>
+            <select id="editPersonUnit">
                 <option value="">Birim Seçin...</option>
             </select>
         </div>
@@ -1028,7 +1013,6 @@ function init() {
     today.setHours(0,0,0,0);
     datePicker.value = formatDateForInput(today);
 
-    // Restore last selected unit from localStorage
     const savedUnit = localStorage.getItem('vardiya_unit') || 'ÇAKABEY-KİLİSE';
     unitFilter.value = savedUnit;
 
@@ -1101,7 +1085,7 @@ function renderSchedule() {
     const personKeys = Object.keys(persons);
 
     // Header
-    let headerHTML = '<tr><th>TARİH/GÜN</th>';
+    let headerHTML = '<tr><th>TARİH / GÜN</th>';
     personKeys.forEach(key => {
         const personUnit = persons[key].unit || '';
         const showByPerson = filterVal === 'all' || filterVal === key;
@@ -1145,13 +1129,13 @@ function renderSchedule() {
             const endStr = `${endOfWeek.getDate()} ${monthNames[endOfWeek.getMonth()]}`;
 
             let trSep = document.createElement('tr');
-            trSep.innerHTML = `<td colspan="${visibleColsCount}" class="week-separator">📅 ${startStr} - ${endStr}</td>`;
+            trSep.innerHTML = `<td colspan="${visibleColsCount}" class="week-separator">📅 ${startStr} — ${endStr} &nbsp;·&nbsp; ${weekIndex + 1}. Hafta</td>`;
             tableBody.appendChild(trSep);
 
             if (idx > 0) {
                 let trSub = document.createElement('tr');
                 trSub.className = 'sub-header';
-                let subHtml = '<th>TARİH/GÜN</th>';
+                let subHtml = '<th>TARİH / GÜN</th>';
                 personKeys.forEach(key => {
                     const personUnit = persons[key].unit || '';
                     const showByPerson = filterVal === 'all' || filterVal === key;
@@ -1177,10 +1161,10 @@ function renderSchedule() {
 
             if (isToday) {
                 trClass = 'row-today';
-                dateBadge = '<div class="badge badge-today">BUGÜN</div>';
+                dateBadge = '<span class="badge badge-today">BUGÜN</span>';
             } else if (isTomorrow) {
                 trClass = 'row-tomorrow';
-                dateBadge = '<div class="badge badge-tomorrow">YARIN</div>';
+                dateBadge = '<span class="badge badge-tomorrow">YARIN</span>';
             }
 
             const dayName = dayNames[rowDate.getDay()];
@@ -1189,7 +1173,7 @@ function renderSchedule() {
             let tr = document.createElement('tr');
             if (trClass) tr.className = trClass;
 
-            let html = `<td><strong>${formattedDateStr}</strong><br>${dayName} ${dateBadge}</td>`;
+            let html = `<td><strong>${formattedDateStr}</strong><br><span style="color:var(--text-3);font-size:11px">${dayName}</span>${dateBadge}</td>`;
 
             personKeys.forEach(key => {
                 const personUnit = persons[key].unit || '';
@@ -1222,24 +1206,24 @@ function renderSchedule() {
     });
 
     // Info panel
-    let infoHtml = `<strong>Birim:</strong> ${unitVal === 'all' ? 'Tüm Birimler' : unitVal}<br>`;
+    let infoHtml = `<span><strong>Birim:</strong> ${unitVal === 'all' ? 'Tüm Birimler' : unitVal}</span>`;
     const wIndex = calculateWeekIndex(selectedDate, unitVal);
     infoHtml += mode === 'week'
-        ? `<strong>Görüntülenen:</strong> ${wIndex + 1}. Hafta<br>`
-        : `<strong>Görüntülenen:</strong> 4 Haftalık Döngü<br>`;
+        ? `<span><strong>Görüntülenen:</strong> ${wIndex + 1}. Hafta</span>`
+        : `<span><strong>Görüntülenen:</strong> 4 Haftalık Döngü</span>`;
 
     if (bugunIzinliler.length > 0) {
-        infoHtml += `<div style="margin-top:5px">🟢 <strong>Bugün İzinli:</strong> <span class="izinli-text">${bugunIzinliler.join(', ')}</span></div>`;
+        infoHtml += `<span>🟢 <strong>Bugün İzinli:</strong> <span class="izinli-text">${bugunIzinliler.join(', ')}</span></span>`;
     } else {
-        infoHtml += `<div style="margin-top:5px">🟢 <strong>Bugün İzinli:</strong> Yok</div>`;
+        infoHtml += `<span>🟢 <strong>Bugün İzinli:</strong> Yok</span>`;
     }
 
     if (yarinIzinliler.length > 0) {
-        infoHtml += `<div style="margin-top:4px">🟡 <strong>Yarın İzinli:</strong> <span class="izinli-text">${yarinIzinliler.join(', ')}</span></div>`;
+        infoHtml += `<span>🟡 <strong>Yarın İzinli:</strong> <span class="izinli-text">${yarinIzinliler.join(', ')}</span></span>`;
     }
 
     if (isAdmin) {
-        infoHtml += `<div style="margin-top:8px;color:#0d6efd;font-size:13px">✏️ Düzenlemek için hücreye çift tıklayın</div>`;
+        infoHtml += `<span style="color:var(--primary);font-size:12px">✏️ Düzenlemek için hücreye çift tıklayın</span>`;
     }
 
     infoPanel.innerHTML = infoHtml;
@@ -1382,7 +1366,7 @@ async function saveEdit() {
         personKeys.forEach(k => scheduleData[week].days[day][k] = '-');
     }
 
-    const personFilter = document.getElementById('personFilter');
+    const personFilterEl = document.getElementById('personFilter');
     const allPersons = Object.keys(persons);
     for (const p of allPersons) {
         if (!scheduleData[week].days[day][p]) {
@@ -1457,12 +1441,12 @@ function renderPersonsList() {
     let html = '<div style="display:flex;flex-direction:column;gap:8px">';
     Object.keys(persons).forEach(key => {
         const p = persons[key];
-        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8f9fa;border-radius:6px">
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm)">
             <div>
-                <div style="font-weight:600">${p.name}</div>
-                <div style="font-size:12px;color:#666">Kısa: ${p.shortName} | Birim: ${p.unit || '-'}</div>
+                <div style="font-weight:600;color:var(--text)">${p.name}</div>
+                <div style="font-size:12px;color:var(--text-3);margin-top:2px">Kısa: ${p.shortName} · Birim: ${p.unit || '—'}</div>
             </div>
-            <button onclick="openEditPersonModal('${key}')" style="background:#0d6efd;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Düzenle</button>
+            <button onclick="openEditPersonModal('${key}')" style="background:var(--primary);color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600">Düzenle</button>
         </div>`;
     });
     html += '</div>';
@@ -1494,7 +1478,6 @@ function savePersonEdit() {
         return;
     }
 
-    // Update person data, preserving schedule data
     persons[key] = { name, shortName, unit: unit || undefined };
     showSpinner();
     saveData().then(() => {
@@ -1509,10 +1492,8 @@ function deletePerson() {
     const key = document.getElementById('editPersonKey').value;
     if (!confirm(`"${persons[key].name}" kişisini silmek istediğinize emin misiniz?\n\nNot: Bu kişinin vardiya kayıtları kalacaktır.`)) return;
 
-    // Remove from persons
     delete persons[key];
 
-    // Remove from all schedule data
     scheduleData.forEach(week => {
         week.days.forEach(day => {
             delete day[key];
@@ -1539,7 +1520,6 @@ function addNewPerson() {
         return;
     }
 
-    // Generate unique key from shortName
     let key = shortName.toLowerCase().replace(/[^a-z0-9]/g, '');
     let originalKey = key;
     let counter = 1;
@@ -1550,7 +1530,6 @@ function addNewPerson() {
 
     persons[key] = { name, shortName, unit: unit || undefined };
 
-    // Initialize new person in all existing schedule days with '-'
     scheduleData.forEach(week => {
         week.days.forEach(day => {
             if (!day[key]) day[key] = '-';
@@ -1587,9 +1566,12 @@ function renderUnitsList() {
     const list = document.getElementById('unitsList');
     let html = '<div style="display:flex;flex-direction:column;gap:8px">';
     units.forEach((unit, index) => {
-        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f8f9fa;border-radius:6px">
-            <div><strong>${unit.name}</strong> <span style="color:#666;font-size:12px">(${unit.cycle} hafta döngü)</span></div>
-            <button onclick="openEditUnitModal(${index})" style="background:#0d6efd;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer">Düzenle</button>
+        html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--bg-3);border:1px solid var(--border);border-radius:var(--radius-sm)">
+            <div>
+                <strong style="color:var(--text)">${unit.name}</strong>
+                <span style="color:var(--text-3);font-size:12px;margin-left:8px">${unit.cycle} hafta döngü</span>
+            </div>
+            <button onclick="openEditUnitModal(${index})" style="background:var(--primary);color:white;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600">Düzenle</button>
         </div>`;
     });
     html += '</div>';
